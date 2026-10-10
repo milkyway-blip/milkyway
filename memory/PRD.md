@@ -27,6 +27,12 @@ Landing page produk susu MilkyWay (susu sapi pasteurisasi 350ml) dengan 10 varia
 - Admin: login JWT, Ringkasan (5 kartu stat, grafik traffic 14 hari, varian terlaris), Pesanan (filter status, ubah status Baru/Diproses/Dikirim/Selesai/Dibatalkan, tombol chat WA pembeli), Konten (edit nama produk, tagline, hero, foto produk, marquee, WA, label harga; CRUD varian lengkap dengan warna & gambar)
 - API: /api/content, /api/track, /api/orders (POST/GET/PATCH), /api/flavors (GET/POST/PUT/DELETE), /api/stats/overview, /api/stats/traffic, /api/auth/*
 
+## Iterasi 2 (10 Okt 2026)
+- Upload foto dari HP/admin: Emergent Object Storage, POST /api/upload (admin-only, maks 5MB, JPG/PNG/WebP/GIF), file publik via GET /api/files/{path}; tombol "Unggah" di foto produk hero & foto varian, URL manual tetap bisa
+- Info Produk editable di CMS: facts (icon/judul/teks) tersimpan di site_content, bisa tambah/hapus baris; landing render dari DB
+- Testimoni pelanggan: koleksi testimonials, CRUD admin (rating bintang, sembunyikan/tampilkan), seksi Testimoni di landing
+- API baru: /api/upload, /api/files/{path}, /api/testimonials (GET/POST/PUT/DELETE)
+
 ## Backlog
 - P0: (kosong — semua permintaan awal terpenuhi)
 - P1: upload gambar langsung (object storage) alih-alih URL; notifikasi email pesanan baru; edit konten Info Produk via CMS

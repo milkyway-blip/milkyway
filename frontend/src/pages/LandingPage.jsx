@@ -7,6 +7,7 @@ import Marquee from "@/components/landing/Marquee";
 import FlavorShowcase from "@/components/landing/FlavorShowcase";
 import BentoSection from "@/components/landing/BentoSection";
 import ProductInfo from "@/components/landing/ProductInfo";
+import Testimonials from "@/components/landing/Testimonials";
 import Footer from "@/components/landing/Footer";
 import CartDrawer from "@/components/landing/CartDrawer";
 import WhatsAppFloat from "@/components/landing/WhatsAppFloat";
@@ -58,7 +59,8 @@ export default function LandingPage() {
         <Marquee text={content.marquee_text} />
         <FlavorShowcase flavors={flavors} priceDisplay={content.price_display} unitSize={content.unit_size} />
         <BentoSection />
-        <ProductInfo />
+        <ProductInfo facts={content.facts || []} />
+        <Testimonials items={data.testimonials || []} />
       </main>
       <Footer content={content} />
       <CartDrawer content={content} />

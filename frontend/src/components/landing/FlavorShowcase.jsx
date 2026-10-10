@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useCart } from "@/context/CartContext";
-import { formatRupiah } from "@/lib/api";
+import { formatRupiah, imgSrc } from "@/lib/api";
 
 function FlavorCard({ flavor, index, unitSize }) {
   const { add, setOpen } = useCart();
@@ -31,7 +31,7 @@ function FlavorCard({ flavor, index, unitSize }) {
       <div className="relative h-36 overflow-hidden sm:h-44" style={{ backgroundColor: flavor.bg_color }}>
         {flavor.image && (
           <img
-            src={flavor.image}
+            src={imgSrc(flavor.image)}
             alt={flavor.name}
             loading="lazy"
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-108"

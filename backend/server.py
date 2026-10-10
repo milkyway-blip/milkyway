@@ -7,13 +7,15 @@ load_dotenv(ROOT_DIR / '.env')
 import logging
 import os
 import re
+import uuid
 import bcrypt
 import jwt
+import requests
 from datetime import datetime, timezone, timedelta
 from typing import Annotated, List, Optional
 
 from bson import ObjectId
-from fastapi import Depends, FastAPI, APIRouter, HTTPException, Request, Response
+from fastapi import Depends, FastAPI, APIRouter, HTTPException, Request, Response, UploadFile, File
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, BeforeValidator, ConfigDict, Field
 from starlette.middleware.cors import CORSMiddleware
@@ -31,6 +33,38 @@ logger = logging.getLogger(__name__)
 PyObjectId = Annotated[str, BeforeValidator(str)]
 JWT_ALGORITHM = "HS256"
 ORDER_STATUSES = ["baru", "diproses", "dikirim", "selesai", "dibatalkan"]
+
+# ---------- Object storage (Emergent) ----------
+STORAGE_BASE = (os.environ.get("INTEGRATION_PROXY_URL") or "").strip() or "https://integrations.emergentagent.com"
+STORAGE_URL = STORAGE_BASE.rstrip("/") + "/objstore/api/v1/storage"
+APP_NAME = "milkyway"
+ALLOWED_IMAGE_TYPES = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif"}
+storage_key = None
+
+
+def init_storage(force: bool = False):
+    global storage_key
+    if storage_key and not force:
+        return storage_key
+    resp = requests.post(f"{STORAGE_URL}/init", json={"emergent_key": os.environ.get("EMERGENT_LLM_KEY")}, timeout=30)
+    resp.raise_for_status()
+    storage_key = resp.json()["storage_key"]
+    return storage_key
+
+
+def put_object(path: str, data: bytes, content_type: str) -> dict:
+    resp = requests.put(f"{STORAGE_URL}/objects/{path}",
+                        headers={"X-Storage-Key": init_storage(), "Content-Type": content_type},
+                        data=data, timeout=120)
+    resp.raise_for_status()
+    return resp.json()
+
+
+def get_object(path: str):
+    resp = requests.get(f"{STORAGE_URL}/objects/{path}",
+                        headers={"X-Storage-Key": init_storage()}, timeout=60)
+    resp.raise_for_status()
+    return resp.content, resp.headers.get("Content-Type", "application/octet-stream")
 
 
 # ---------- Base document ----------
@@ -77,6 +111,12 @@ class FlavorInput(BaseModel):
     active: bool = True
 
 
+class Fact(BaseModel):
+    icon: str = "shield"
+    title: str = ""
+    text: str = ""
+
+
 class ContentModel(BaseDocument):
     key: str = "landing"
     product_name: str = "MilkyWay"
@@ -88,6 +128,7 @@ class ContentModel(BaseDocument):
     whatsapp_number: str = "081227646940"
     price_display: str = "Rp 15.000"
     unit_size: str = "350ml"
+    facts: List[Fact] = Field(default_factory=list)
 
 
 class ContentUpdate(BaseModel):
@@ -99,6 +140,7 @@ class ContentUpdate(BaseModel):
     marquee_text: Optional[str] = None
     whatsapp_number: Optional[str] = None
     price_display: Optional[str] = None
+    facts: Optional[List[Fact]] = None
 
 
 class OrderItem(BaseModel):
@@ -134,6 +176,22 @@ class OrderInput(BaseModel):
 
 class StatusUpdate(BaseModel):
     status: str
+
+
+class Testimonial(BaseDocument):
+    name: str
+    text: str
+    rating: int = 5
+    active: bool = True
+    order: int = 0
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class TestimonialInput(BaseModel):
+    name: str
+    text: str
+    rating: int = 5
+    active: bool = True
 
 
 class LoginInput(BaseModel):
@@ -269,9 +327,11 @@ async def root():
 async def get_content():
     content = await db.site_content.find_one({"key": "landing"})
     flavors = await db.flavors.find({"active": True}).sort("order", 1).to_list(100)
+    testimonials = await db.testimonials.find({"active": True}).sort("order", 1).to_list(50)
     return {
         "content": (ContentModel.from_mongo(content) if content else ContentModel()).model_dump(),
         "flavors": [Flavor.from_mongo(f).model_dump() for f in flavors],
+        "testimonials": [Testimonial.from_mongo(t).model_dump() for t in testimonials],
     }
 
 
@@ -364,6 +424,77 @@ async def delete_flavor(flavor_id: str, user=Depends(get_current_user)):
     return {"ok": True}
 
 
+# ---------- Admin: uploads ----------
+@api_router.post("/upload")
+async def upload_file(file: UploadFile = File(...), user=Depends(get_current_user)):
+    content_type = file.content_type or ""
+    if content_type not in ALLOWED_IMAGE_TYPES:
+        raise HTTPException(status_code=400, detail="Hanya file gambar (JPG, PNG, WebP) yang diperbolehkan")
+    data = await file.read()
+    if len(data) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="Ukuran file maksimal 5MB")
+    path = f"{APP_NAME}/uploads/{user['id']}/{uuid.uuid4()}.{ALLOWED_IMAGE_TYPES[content_type]}"
+    result = put_object(path, data, content_type)
+    await db.files.insert_one({
+        "storage_path": result["path"],
+        "original_filename": file.filename,
+        "content_type": content_type,
+        "size": result.get("size", len(data)),
+        "is_deleted": False,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+    return {"url": f"/api/files/{result['path']}"}
+
+
+@api_router.get("/files/{path:path}")
+async def download_file(path: str):
+    record = await db.files.find_one({"storage_path": path, "is_deleted": False})
+    if not record:
+        raise HTTPException(status_code=404, detail="File tidak ditemukan")
+    try:
+        data, content_type = get_object(path)
+    except Exception:
+        raise HTTPException(status_code=404, detail="File tidak ditemukan di storage")
+    return Response(content=data, media_type=record.get("content_type", content_type))
+
+
+# ---------- Admin: testimonials ----------
+@api_router.get("/testimonials", response_model=List[Testimonial], response_model_by_alias=False)
+async def list_testimonials(user=Depends(get_current_user)):
+    docs = await db.testimonials.find().sort("order", 1).to_list(200)
+    return [Testimonial.from_mongo(d) for d in docs]
+
+
+@api_router.post("/testimonials", response_model=Testimonial, response_model_by_alias=False)
+async def create_testimonial(body: TestimonialInput, user=Depends(get_current_user)):
+    count = await db.testimonials.count_documents({})
+    t = Testimonial(order=count, rating=max(1, min(body.rating, 5)),
+                    **body.model_dump(exclude={"rating"}))
+    result = await db.testimonials.insert_one(t.to_mongo())
+    doc = await db.testimonials.find_one({"_id": result.inserted_id})
+    return Testimonial.from_mongo(doc)
+
+
+@api_router.put("/testimonials/{tid}", response_model=Testimonial, response_model_by_alias=False)
+async def update_testimonial(tid: str, body: TestimonialInput, user=Depends(get_current_user)):
+    oid = to_object_id(tid)
+    payload = body.model_dump()
+    payload["rating"] = max(1, min(payload["rating"], 5))
+    result = await db.testimonials.update_one({"_id": oid}, {"$set": payload})
+    if not result.matched_count:
+        raise HTTPException(status_code=404, detail="Testimoni tidak ditemukan")
+    doc = await db.testimonials.find_one({"_id": oid})
+    return Testimonial.from_mongo(doc)
+
+
+@api_router.delete("/testimonials/{tid}")
+async def delete_testimonial(tid: str, user=Depends(get_current_user)):
+    result = await db.testimonials.delete_one({"_id": to_object_id(tid)})
+    if not result.deleted_count:
+        raise HTTPException(status_code=404, detail="Testimoni tidak ditemukan")
+    return {"ok": True}
+
+
 # ---------- Admin: stats ----------
 @api_router.get("/stats/overview")
 async def stats_overview(user=Depends(get_current_user)):
@@ -442,7 +573,20 @@ DEFAULT_CONTENT = {
     "whatsapp_number": "081227646940",
     "price_display": "Rp 15.000",
     "unit_size": "350ml",
+    "facts": [
+        {"icon": "flask", "title": "Komposisi", "text": "Susu murni, gula, syrup/bubuk perisa. Tanpa pengawet maupun pemanis buatan."},
+        {"icon": "snowflake", "title": "Penyimpanan", "text": "Simpan pada suhu 2\u20134\u00b0C agar kesegaran tetap terjaga."},
+        {"icon": "calendar", "title": "Masa Simpan", "text": "1,5 minggu di dalam kulkas sejak tanggal produksi."},
+        {"icon": "timer", "title": "Suhu Ruang", "text": "Tahan hingga 6 jam di suhu ruang \u2014 segera dinginkan kembali."},
+        {"icon": "shield", "title": "Tersertifikasi Halal", "text": "No. Sertifikat ID34110080995230926."},
+    ],
 }
+
+DEFAULT_TESTIMONIALS = [
+    {"name": "Dina P.", "text": "Taronya creamy banget dan botolnya masih dingin pas sampai. Anakku langsung habis satu.", "rating": 5},
+    {"name": "Rizky A.", "text": "Bisa campur banyak rasa dalam satu pesanan itu praktis banget buat stok di kulkas kantor.", "rating": 5},
+    {"name": "Sari M.", "text": "Matcha dan cokelatnya favorit. Manisnya pas, nggak bikin eneg.", "rating": 4},
+]
 
 DEFAULT_FLAVORS = [
     {"key": "plain-zero-sugar", "name": "Plain Zero Sugar", "badge": "0% Gula", "bg_color": "#F8FAFC", "border_color": "#CBD5E1", "text_color": "#334155", "image": "https://images.unsplash.com/photo-1639151082235-406d8eb262b9?crop=entropy&cs=srgb&fm=jpg&q=85"},
@@ -459,9 +603,17 @@ DEFAULT_FLAVORS = [
 
 
 async def seed_content():
-    if not await db.site_content.find_one({"key": "landing"}):
+    existing = await db.site_content.find_one({"key": "landing"})
+    if not existing:
         await db.site_content.insert_one(DEFAULT_CONTENT)
         logger.info("Default landing content seeded")
+    elif "facts" not in existing:
+        await db.site_content.update_one({"key": "landing"}, {"$set": {"facts": DEFAULT_CONTENT["facts"]}})
+        logger.info("Product facts migrated")
+    if await db.testimonials.count_documents({}) == 0:
+        for i, t in enumerate(DEFAULT_TESTIMONIALS):
+            await db.testimonials.insert_one(Testimonial(order=i, **t).to_mongo())
+        logger.info("Default testimonials seeded")
     if await db.flavors.count_documents({}) == 0:
         for i, f in enumerate(DEFAULT_FLAVORS):
             await db.flavors.insert_one(Flavor(order=i, price=15000, **f).to_mongo())
@@ -473,6 +625,11 @@ async def startup():
     await db.users.create_index("email", unique=True)
     await db.login_attempts.create_index("identifier")
     await db.visits.create_index("date")
+    try:
+        init_storage()
+        logger.info("Object storage initialized")
+    except Exception as e:
+        logger.error("Storage init failed: %s", e)
     await seed_admin()
     await seed_content()
 

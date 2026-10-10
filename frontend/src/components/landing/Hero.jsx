@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, MessageCircle, Sparkles } from "lucide-react";
-import { waLink } from "@/lib/api";
+import { imgSrc, waLink } from "@/lib/api";
 
 export default function Hero({ content }) {
   const ref = useRef(null);
@@ -118,7 +118,7 @@ export default function Hero({ content }) {
             className="overflow-hidden rounded-b-[2.5rem] rounded-t-[999px] border-8 border-white shadow-2xl shadow-brand-blue/25"
           >
             <img
-              src={content.hero_image}
+              src={imgSrc(content.hero_image)}
               alt={`${content.product_name} ${content.unit_size}`}
               className="aspect-[3/4] w-full object-cover"
               data-testid="hero-image"

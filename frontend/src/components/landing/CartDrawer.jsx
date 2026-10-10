@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2, MessageCircle, Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { useCart } from "@/context/CartContext";
-import api, { formatApiError, formatRupiah, waLink } from "@/lib/api";
+import api, { formatApiError, formatRupiah, imgSrc, waLink } from "@/lib/api";
 
 const buildWaMessage = (o) =>
   [
@@ -145,7 +145,7 @@ export default function CartDrawer({ content }) {
                   {items.map((i) => (
                     <div key={i.id} className="flex gap-3 rounded-2xl border border-brand-navy/5 bg-brand-cream/60 p-3" data-testid={`cart-item-${i.id}`}>
                       <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl" style={{ backgroundColor: i.bg_color }}>
-                        {i.image && <img src={i.image} alt={i.name} className="h-full w-full object-cover" />}
+                        {i.image && <img src={imgSrc(i.image)} alt={i.name} className="h-full w-full object-cover" />}
                       </div>
                       <div className="flex flex-1 flex-col">
                         <div className="flex items-start justify-between gap-2">

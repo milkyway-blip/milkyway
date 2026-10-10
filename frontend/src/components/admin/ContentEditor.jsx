@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Eye, EyeOff, Pencil, Plus, Trash2, X } from "lucide-react";
+import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
-import api, { formatApiError, formatRupiah } from "@/lib/api";
+import api, { formatApiError, formatRupiah, imgSrc } from "@/lib/api";
+import ImageUpload from "@/components/admin/ImageUpload";
+import FactsEditor from "@/components/admin/FactsEditor";
+import TestimonialsManager from "@/components/admin/TestimonialsManager";
 
 const emptyFlavor = {
   name: "",
@@ -30,7 +33,7 @@ function FlavorModal({ initial, onClose, onSaved }) {
       name: f.name.trim(),
       badge: f.badge.trim(),
       price: parseInt(f.price, 10) || 15000,
-      image: f.image.trim(),
+      image: (f.image || "").trim(),
       bg_color: f.bg_color,
       border_color: f.border_color,
       text_color: f.text_color,
@@ -53,7 +56,7 @@ function FlavorModal({ initial, onClose, onSaved }) {
     <label className="flex items-center justify-between gap-3 rounded-xl border border-brand-navy/10 px-3 py-2">
       <span className="text-xs font-semibold text-brand-navy/60">{label}</span>
       <span className="flex items-center gap-2">
-        <span className="text-[11px] font-mono text-brand-navy/40">{f[key]}</span>
+        <span className="font-mono text-[11px] text-brand-navy/40">{f[key]}</span>
         <input
           type="color"
           value={f[key]}
@@ -118,16 +121,8 @@ function FlavorModal({ initial, onClose, onSaved }) {
             />
           </div>
           <div>
-            <input
-              value={f.image}
-              onChange={(e) => set("image", e.target.value)}
-              placeholder="URL gambar varian (https://...)"
-              className="w-full rounded-xl border border-brand-navy/10 px-4 py-2.5 text-sm outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
-              data-testid="flavor-form-image"
-            />
-            {f.image && (
-              <img src={f.image} alt="Pratinjau" className="mt-2 h-28 w-full rounded-xl object-cover" data-testid="flavor-form-image-preview" />
-            )}
+            <label className="mb-1 block text-xs font-bold text-brand-navy/60">Foto Varian</label>
+            <ImageUpload value={f.image} onChange={(url) => set("image", url)} testid="flavor-form-image" />
           </div>
           <div className="grid gap-2.5 sm:grid-cols-3">
             {colorField("bg_color", "Warna latar")}
@@ -186,6 +181,7 @@ export default function ContentEditor() {
         marquee_text: content.marquee_text,
         whatsapp_number: content.whatsapp_number,
         price_display: content.price_display,
+        facts: content.facts || [],
       });
       toast.success("Konten landing page tersimpan");
     } catch (e) {
@@ -237,11 +233,12 @@ export default function ContentEditor() {
             <textarea value={content.hero_subtitle || ""} onChange={setC("hero_subtitle")} rows={3} className={`${inputCls} resize-none`} data-testid="cms-hero-subtitle" />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-bold text-brand-navy/60">Foto Produk (URL gambar)</label>
-            <input value={content.hero_image || ""} onChange={setC("hero_image")} placeholder="https://..." className={inputCls} data-testid="cms-hero-image" />
-            {content.hero_image && (
-              <img src={content.hero_image} alt="Pratinjau foto produk" className="mt-2 h-36 w-full rounded-xl object-cover" data-testid="cms-hero-image-preview" />
-            )}
+            <label className="mb-1 block text-xs font-bold text-brand-navy/60">Foto Produk</label>
+            <ImageUpload
+              value={content.hero_image || ""}
+              onChange={(url) => setContent((c) => ({ ...c, hero_image: url }))}
+              testid="cms-hero-image"
+            />
           </div>
           <div>
             <label className="mb-1 block text-xs font-bold text-brand-navy/60">Teks Marquee (pisahkan dengan •)</label>
@@ -256,6 +253,16 @@ export default function ContentEditor() {
               <label className="mb-1 block text-xs font-bold text-brand-navy/60">Label Harga</label>
               <input value={content.price_display || ""} onChange={setC("price_display")} className={inputCls} data-testid="cms-price-display" />
             </div>
+          </div>
+
+          <div className="border-t border-brand-navy/5 pt-4">
+            <label className="mb-2 block text-xs font-bold text-brand-navy/60">
+              Info Produk (komposisi, masa simpan, halal, dll.)
+            </label>
+            <FactsEditor
+              facts={content.facts || []}
+              onChange={(facts) => setContent((c) => ({ ...c, facts }))}
+            />
           </div>
         </div>
 
@@ -294,7 +301,7 @@ export default function ContentEditor() {
               data-testid={`cms-flavor-row-${fl.key}`}
             >
               <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-white">
-                {fl.image && <img src={fl.image} alt={fl.name} className="h-full w-full object-cover" />}
+                {fl.image && <img src={imgSrc(fl.image)} alt={fl.name} className="h-full w-full object-cover" />}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-bold" style={{ color: fl.text_color }}>
@@ -329,6 +336,8 @@ export default function ContentEditor() {
           ))}
         </div>
       </div>
+
+      <TestimonialsManager />
 
       <AnimatePresence>
         {editing && (

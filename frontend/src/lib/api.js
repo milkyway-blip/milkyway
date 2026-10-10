@@ -38,4 +38,16 @@ export const waLink = (number, text) => {
   return `https://wa.me/${intl}?text=${encodeURIComponent(text)}`;
 };
 
+export const imgSrc = (u) =>
+  u && u.startsWith("/api/") ? `${process.env.REACT_APP_BACKEND_URL}${u}` : u;
+
+export const uploadImage = async (file) => {
+  const form = new FormData();
+  form.append("file", file);
+  const { data } = await api.post("/upload", form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data.url;
+};
+
 export default api;
