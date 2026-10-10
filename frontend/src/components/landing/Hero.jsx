@@ -158,7 +158,7 @@ export default function Hero({ content, flavors, onPickFlavor }) {
             </span>
             <div>
               <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--ink-muted)]">Pasteurisasi</p>
-              <p className="font-display text-lg font-semibold leading-none">Suhu Tepat</p>
+              <p className="font-display text-lg font-semibold leading-none">72°C · 15 dtk</p>
             </div>
           </motion.div>
 
