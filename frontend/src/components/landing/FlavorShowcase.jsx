@@ -144,7 +144,7 @@ export default function FlavorShowcase({ flavors, unitSize, selectedKey, onSelec
                     {qty}
                   </span>
                   <button
-                    onClick={() => setQty((q) => Math.min(99, q + 1))}
+                    onClick={() => setQty((q) => Math.min(active.stock ?? 99, q + 1))}
                     className="grid h-9 w-9 place-items-center rounded-full text-[var(--cream)] transition-transform hover:scale-105"
                     style={{ background: active.text_color }}
                     data-testid={`qty-plus-${active.key}`}

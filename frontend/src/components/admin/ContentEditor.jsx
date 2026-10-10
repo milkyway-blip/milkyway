@@ -38,6 +38,7 @@ function FlavorModal({ initial, onClose, onSaved }) {
       border_color: f.border_color,
       text_color: f.text_color,
       active: !!f.active,
+      stock: f.stock === null || f.stock === undefined || f.stock === "" ? null : parseInt(f.stock, 10),
     };
     try {
       if (f.id) await api.put(`/flavors/${f.id}`, payload);
@@ -109,17 +110,32 @@ function FlavorModal({ initial, onClose, onSaved }) {
             className="w-full rounded-xl border border-brand-navy/10 px-4 py-2.5 text-sm outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
             data-testid="flavor-form-badge"
           />
-          <div className="flex items-center gap-3">
-            <label className="text-xs font-semibold text-brand-navy/60">Harga / botol</label>
-            <input
-              type="number"
-              min="0"
-              value={f.price}
-              onChange={(e) => set("price", e.target.value)}
-              className="w-32 rounded-xl border border-brand-navy/10 px-4 py-2.5 text-sm outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
-              data-testid="flavor-form-price"
-            />
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-3">
+              <label className="text-xs font-semibold text-brand-navy/60">Harga / botol</label>
+              <input
+                type="number"
+                min="0"
+                value={f.price}
+                onChange={(e) => set("price", e.target.value)}
+                className="w-32 rounded-xl border border-brand-navy/10 px-4 py-2.5 text-sm outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
+                data-testid="flavor-form-price"
+              />
+            </div>
+            <div className="flex items-center gap-3">
+              <label className="text-xs font-semibold text-brand-navy/60">Stok</label>
+              <input
+                type="number"
+                min="0"
+                value={f.stock ?? ""}
+                placeholder="Tak terbatas"
+                onChange={(e) => set("stock", e.target.value)}
+                className="w-32 rounded-xl border border-brand-navy/10 px-4 py-2.5 text-sm outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
+                data-testid="flavor-form-stock"
+              />
+            </div>
           </div>
+          <p className="-mt-1 text-[11px] text-brand-navy/40">Kosongkan stok jika tidak dibatasi. Isi 0 untuk menandai habis.</p>
           <div>
             <label className="mb-1 block text-xs font-bold text-brand-navy/60">Foto Varian</label>
             <ImageUpload value={f.image} onChange={(url) => set("image", url)} testid="flavor-form-image" />
@@ -326,7 +342,7 @@ export default function ContentEditor() {
                   )}
                 </p>
                 <p className="text-xs" style={{ color: fl.text_color, opacity: 0.7 }}>
-                  {formatRupiah(fl.price)} {fl.badge && `• ${fl.badge}`}
+                  {formatRupiah(fl.price)} {fl.badge && `• ${fl.badge}`} {fl.stock != null && `• Stok ${fl.stock}`}
                 </p>
               </div>
               <button

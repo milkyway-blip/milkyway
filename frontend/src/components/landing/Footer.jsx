@@ -59,8 +59,7 @@ export default function Footer({ content }) {
           <div className="mt-5 flex items-start gap-2.5 text-sm text-[var(--cream)]/70">
             <Clock className="mt-0.5 h-4 w-4 shrink-0 text-[var(--gold)]" />
             <div>
-              <p>Setiap Hari</p>
-              <p className="font-semibold text-[var(--cream)]">08.00 – 20.00 WIB</p>
+              <p className="font-semibold text-[var(--cream)]">{content.pickup_hours || "Setiap Hari 08.00–20.00 WIB"}</p>
             </div>
           </div>
           <div className="mt-4 flex items-start gap-2.5 text-sm text-[var(--cream)]/70">

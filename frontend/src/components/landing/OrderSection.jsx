@@ -203,7 +203,17 @@ export default function OrderSection({ flavors, content }) {
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-sm font-semibold">{f.name}</p>
-                            <p className="text-xs text-[var(--ink-muted)]">{formatRupiah(f.price)} / botol</p>
+                            <p className="text-xs text-[var(--ink-muted)]">
+                              {formatRupiah(f.price)} / botol
+                              {f.stock != null && (
+                                <span
+                                  className={`ml-1.5 font-semibold ${f.stock === 0 ? "text-red-500" : "text-[var(--pasture)]"}`}
+                                  data-testid={`stock-${f.key}`}
+                                >
+                                  · {f.stock === 0 ? "Stok habis" : `Stok ${f.stock}`}
+                                </span>
+                              )}
+                            </p>
                           </div>
                           <div className="flex items-center gap-2">
                             <button
@@ -221,8 +231,9 @@ export default function OrderSection({ flavors, content }) {
                             </span>
                             <button
                               type="button"
+                              disabled={f.stock != null && q >= f.stock}
                               onClick={() => (q === 0 ? add(f, 1) : setQty(f.id, q + 1))}
-                              className="grid h-9 w-9 place-items-center rounded-full text-[var(--cream)] transition-transform hover:scale-105"
+                              className="grid h-9 w-9 place-items-center rounded-full text-[var(--cream)] transition-transform hover:scale-105 disabled:opacity-30 disabled:hover:scale-100"
                               style={{ background: f.text_color }}
                               data-testid={`cart-plus-${f.key}`}
                               aria-label={`Tambah ${f.name}`}

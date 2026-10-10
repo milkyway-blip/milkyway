@@ -55,6 +55,12 @@ Landing page produk susu MilkyWay (susu sapi pasteurisasi 350ml) dengan 10 varia
 - Navbar pill jadi putih; tombol navbar kontekstual: keranjang kosong = "Pesan Sekarang", terisi = "Cek Pesanan" (keduanya menuju #pesan); tombol WA konfirmasi berdenyut setelah pesanan tersimpan
 - Kolom "Alamat lengkap" dihapus dari form pemesanan (model pengambilan); alamat jadi opsional di backend, admin & CSV tetap menampilkan alamat bila ada
 
+## Iterasi 7 (10 Okt 2026)
+- Stok per varian: field stock (null = tak terbatas, 0 = habis) di model Flavor + input "Stok" di modal varian admin; tampil "Stok n" / "Stok habis" di daftar Pilih Varian & Jumlah, tombol plus nonaktif saat mencapai stok, backend menolak pesanan melebihi stok (400 dengan pesan jelas)
+- Jam operasional footer kini mengikuti pickup_hours dari CMS (otomatis "Senin - Jumat, 07.00-17.00 WIB")
+- Jam pengambilan diubah ke "Senin - Jumat, 07.00-17.00 WIB" via API konten
+- MENUNGGU: alamat pengambilan asli dari user (kolom cms-pickup-address sudah siap)
+
 ## Backlog
 - P0: (kosong — semua permintaan awal terpenuhi)
 - P1: upload gambar langsung (object storage) alih-alih URL; notifikasi email pesanan baru; edit konten Info Produk via CMS

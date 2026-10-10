@@ -100,6 +100,7 @@ class Flavor(BaseDocument):
     price: int = 15000
     active: bool = True
     order: int = 0
+    stock: Optional[int] = None
 
 
 class FlavorInput(BaseModel):
@@ -111,6 +112,7 @@ class FlavorInput(BaseModel):
     image: str = ""
     price: int = 15000
     active: bool = True
+    stock: Optional[int] = None
 
 
 class Fact(BaseModel):
@@ -357,6 +359,9 @@ async def create_order(body: OrderInput):
         fl = await db.flavors.find_one({"_id": to_object_id(it.flavor_id)})
         if not fl or not fl.get("active", True):
             raise HTTPException(status_code=400, detail="Ada varian yang tidak tersedia")
+        stock = fl.get("stock")
+        if stock is not None and it.qty > stock:
+            raise HTTPException(status_code=400, detail=f"Stok {fl['name']} tersisa {stock}")
         qty = max(1, min(it.qty, 99))
         price = int(fl.get("price", 15000))
         items.append(OrderItem(flavor_id=str(fl["_id"]), name=fl["name"], qty=qty, price=price))
