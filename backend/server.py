@@ -369,6 +369,11 @@ async def create_order(body: OrderInput):
     order = Order(customer_name=body.customer_name.strip(), whatsapp=body.whatsapp.strip(),
                   address=body.address.strip(), note=body.note.strip(), items=items, total=total)
     result = await db.orders.insert_one(order.to_mongo())
+    for item in items:
+        await db.flavors.update_one(
+            {"_id": ObjectId(item.flavor_id), "stock": {"$ne": None}},
+            {"$inc": {"stock": -item.qty}},
+        )
     order.id = str(result.inserted_id)
     return order
 
@@ -403,10 +408,22 @@ async def export_orders_csv(user=Depends(get_current_user)):
 async def update_order_status(order_id: str, body: StatusUpdate, user=Depends(get_current_user)):
     if body.status not in ORDER_STATUSES:
         raise HTTPException(status_code=400, detail="Status tidak valid")
-    result = await db.orders.update_one({"_id": to_object_id(order_id)}, {"$set": {"status": body.status}})
-    if not result.matched_count:
+    oid = to_object_id(order_id)
+    old = await db.orders.find_one({"_id": oid})
+    if not old:
         raise HTTPException(status_code=404, detail="Pesanan tidak ditemukan")
-    doc = await db.orders.find_one({"_id": ObjectId(order_id)})
+    await db.orders.update_one({"_id": oid}, {"$set": {"status": body.status}})
+    was_cancelled = old.get("status") == "dibatalkan"
+    now_cancelled = body.status == "dibatalkan"
+    delta = 1 if (now_cancelled and not was_cancelled) else (-1 if (was_cancelled and not now_cancelled) else 0)
+    if delta:
+        for item in old.get("items", []):
+            if ObjectId.is_valid(item.get("flavor_id", "")):
+                await db.flavors.update_one(
+                    {"_id": ObjectId(item["flavor_id"]), "stock": {"$ne": None}},
+                    {"$inc": {"stock": delta * item.get("qty", 0)}},
+                )
+    doc = await db.orders.find_one({"_id": oid})
     return Order.from_mongo(doc)
 
 

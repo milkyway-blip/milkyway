@@ -61,6 +61,9 @@ Landing page produk susu MilkyWay (susu sapi pasteurisasi 350ml) dengan 10 varia
 - Jam pengambilan diubah ke "Senin - Jumat, 07.00-17.00 WIB" via API konten
 - MENUNGGU: alamat pengambilan asli dari user (kolom cms-pickup-address sudah siap)
 
+## Iterasi 8 (10 Okt 2026)
+- Stok otomatis: stok varian ter-track berkurang atomik ($inc) setiap pesanan masuk; saat admin menandai "Dibatalkan" stok kembali, dan berkurang lagi jika pesanan diaktifkan ulang
+
 ## Backlog
 - P0: (kosong — semua permintaan awal terpenuhi)
 - P1: upload gambar langsung (object storage) alih-alih URL; notifikasi email pesanan baru; edit konten Info Produk via CMS
