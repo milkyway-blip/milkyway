@@ -14,7 +14,7 @@ export default function Footer({ content }) {
             <img src="/logo.png" alt={content.product_name} className="h-8 w-auto" />
           </div>
           <p className="mt-5 max-w-sm font-display text-2xl font-light leading-snug text-[var(--cream)]/90">
-            {content.tagline} — segar setiap hari, langsung dari peternakan.
+            {content.tagline} — tanpa pengawet, tanpa pemanis buatan.
           </p>
           <a
             href={waLink(content.whatsapp_number, "Halo MilkyWay! Saya mau pesan susu.")}
