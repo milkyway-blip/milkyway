@@ -51,6 +51,10 @@ Landing page produk susu MilkyWay (susu sapi pasteurisasi 350ml) dengan 10 varia
 - Ekspor CSV semua pesanan: GET /api/orders/export.csv (admin-only, BOM utk Excel) + tombol "Unduh CSV" di tab Pesanan
 - Nav diganti: Varian Rasa, Janji Kami, Proses, Testimoni, FAQ; eyebrow hero sejajar dengan judul
 
+## Iterasi 6 (10 Okt 2026)
+- Navbar pill jadi putih; tombol navbar kontekstual: keranjang kosong = "Pesan Sekarang", terisi = "Cek Pesanan" (keduanya menuju #pesan); tombol WA konfirmasi berdenyut setelah pesanan tersimpan
+- Kolom "Alamat lengkap" dihapus dari form pemesanan (model pengambilan); alamat jadi opsional di backend, admin & CSV tetap menampilkan alamat bila ada
+
 ## Backlog
 - P0: (kosong — semua permintaan awal terpenuhi)
 - P1: upload gambar langsung (object storage) alih-alih URL; notifikasi email pesanan baru; edit konten Info Produk via CMS

@@ -17,7 +17,7 @@ const buildWaMessage = (o) =>
     "",
     `Nama: ${o.customer_name}`,
     `No. WA: ${o.whatsapp}`,
-    `Alamat: ${o.address}`,
+    o.address ? `Alamat: ${o.address}` : null,
     o.note ? `Catatan: ${o.note}` : null,
   ]
     .filter((l) => l !== null)
@@ -25,7 +25,7 @@ const buildWaMessage = (o) =>
 
 export default function OrderSection({ flavors, content }) {
   const { items, add, setQty, clear, count, total } = useCart();
-  const [form, setForm] = useState({ name: "", whatsapp: "", address: "", note: "" });
+  const [form, setForm] = useState({ name: "", whatsapp: "", note: "" });
   const [sending, setSending] = useState(false);
   const [placed, setPlaced] = useState(null);
 
@@ -35,8 +35,8 @@ export default function OrderSection({ flavors, content }) {
   const submit = async (e) => {
     e.preventDefault();
     if (!count) return;
-    if (!form.name.trim() || !form.whatsapp.trim() || !form.address.trim()) {
-      toast.error("Lengkapi nama, nomor WhatsApp, dan alamat dulu ya");
+    if (!form.name.trim() || !form.whatsapp.trim()) {
+      toast.error("Lengkapi nama dan nomor WhatsApp dulu ya");
       return;
     }
     setSending(true);
@@ -44,7 +44,6 @@ export default function OrderSection({ flavors, content }) {
       const { data } = await api.post("/orders", {
         customer_name: form.name,
         whatsapp: form.whatsapp,
-        address: form.address,
         note: form.note,
         items: items.map((i) => ({ flavor_id: i.id, qty: i.qty })),
       });
@@ -168,7 +167,7 @@ export default function OrderSection({ flavors, content }) {
                   href={waLink(content.whatsapp_number, buildWaMessage(placed))}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#25D366] px-7 py-3.5 text-sm font-bold text-white shadow-[0_16px_40px_-12px_rgba(37,211,102,0.6)] transition hover:brightness-95 active:scale-95"
+                  className="pulse-ring mt-7 inline-flex items-center gap-2 rounded-full bg-[#25D366] px-7 py-3.5 text-sm font-bold text-white shadow-[0_16px_40px_-12px_rgba(37,211,102,0.6)] transition hover:brightness-95 active:scale-95"
                   data-testid="whatsapp-confirm-btn"
                 >
                   <MessageCircle className="h-4 w-4" />
@@ -241,8 +240,7 @@ export default function OrderSection({ flavors, content }) {
                   <input required minLength={2} value={form.name} onChange={set("name")} className="field" placeholder="Nama lengkap" data-testid="order-form-name-input" />
                   <input required minLength={8} type="tel" value={form.whatsapp} onChange={set("whatsapp")} className="field" placeholder="Nomor WhatsApp (08xx)" data-testid="order-form-whatsapp-input" />
                 </div>
-                <textarea required minLength={5} rows={2} value={form.address} onChange={set("address")} className="field resize-none" placeholder="Alamat lengkap" data-testid="order-form-address-input" />
-                <textarea rows={2} value={form.note} onChange={set("note")} className="field resize-none" placeholder="Catatan (opsional): patokan alamat, waktu pengambilan, dll." data-testid="order-form-note-input" />
+                <textarea rows={2} value={form.note} onChange={set("note")} className="field resize-none" placeholder="Catatan (opsional): waktu pengambilan, jumlah es, dll." data-testid="order-form-note-input" />
 
                 <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
                   <div>

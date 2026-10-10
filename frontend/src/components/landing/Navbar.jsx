@@ -17,7 +17,7 @@ export default function Header({ content }) {
 
   return (
     <header className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-3" data-testid="navbar">
-      <div className="pointer-events-auto flex w-full max-w-5xl items-center justify-between gap-2 rounded-full border border-[var(--line)] bg-[rgba(250,245,234,0.88)] py-2 pl-4 pr-2 shadow-[0_20px_50px_-30px_rgba(26,26,24,0.45)] backdrop-blur-xl sm:pl-5">
+      <div className="pointer-events-auto flex w-full max-w-5xl items-center justify-between gap-2 rounded-full border border-[var(--line)] bg-[rgba(255,255,255,0.92)] py-2 pl-4 pr-2 shadow-[0_20px_50px_-30px_rgba(26,26,24,0.45)] backdrop-blur-xl sm:pl-5">
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           className="flex shrink-0 items-center"
@@ -58,7 +58,7 @@ export default function Header({ content }) {
             className="btn-pill primary !px-5 !py-2.5 !text-xs"
             data-testid="nav-order-btn"
           >
-            Pesan Sekarang
+            {count > 0 ? `Cek Pesanan` : "Pesan Sekarang"}
           </button>
         </div>
       </div>

@@ -175,7 +175,7 @@ class OrderItemInput(BaseModel):
 class OrderInput(BaseModel):
     customer_name: str
     whatsapp: str
-    address: str
+    address: str = ""
     note: str = ""
     items: List[OrderItemInput]
 

@@ -125,10 +125,12 @@ export default function OrdersTable() {
               </ul>
 
               <div className="mt-3 space-y-1.5 text-xs text-brand-navy/55">
-                <p className="flex items-start gap-1.5">
-                  <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-blue" />
-                  {o.address}
-                </p>
+                {o.address && (
+                  <p className="flex items-start gap-1.5">
+                    <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-blue" />
+                    {o.address}
+                  </p>
+                )}
                 {o.note && (
                   <p className="flex items-start gap-1.5">
                     <StickyNote className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-blue" />
