@@ -64,6 +64,7 @@ Landing page produk susu MilkyWay (susu sapi pasteurisasi 350ml) dengan 10 varia
 ## Iterasi 8 (10 Okt 2026)
 - Stok otomatis: stok varian ter-track berkurang atomik ($inc) setiap pesanan masuk; saat admin menandai "Dibatalkan" stok kembali, dan berkurang lagi jika pesanan diaktifkan ulang
 - Teks footer diganti: "Susu Sapi Pasteurisasi — tanpa pengawet, tanpa pemanis buatan."; dikonfirmasi gambar hero & per-varian sudah editable via CMS
+- Hero bottle card kini memakai foto produk asli (MilkyWay Matcha, diunggah user via storage) diset lewat field hero_image CMS
 
 ## Backlog
 - P0: (kosong — semua permintaan awal terpenuhi)
