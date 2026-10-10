@@ -4,6 +4,8 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
+import csv
+import io
 import logging
 import os
 import re
@@ -129,6 +131,8 @@ class ContentModel(BaseDocument):
     price_display: str = "Rp 15.000"
     unit_size: str = "350ml"
     facts: List[Fact] = Field(default_factory=list)
+    pickup_address: str = ""
+    pickup_hours: str = ""
 
 
 class ContentUpdate(BaseModel):
@@ -141,6 +145,8 @@ class ContentUpdate(BaseModel):
     whatsapp_number: Optional[str] = None
     price_display: Optional[str] = None
     facts: Optional[List[Fact]] = None
+    pickup_address: Optional[str] = None
+    pickup_hours: Optional[str] = None
 
 
 class OrderItem(BaseModel):
@@ -369,6 +375,25 @@ async def list_orders(user=Depends(get_current_user)):
     return [Order.from_mongo(d) for d in docs]
 
 
+@api_router.get("/orders/export.csv")
+async def export_orders_csv(user=Depends(get_current_user)):
+    docs = await db.orders.find().sort("created_at", -1).to_list(5000)
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(["Tanggal", "Nama", "WhatsApp", "Alamat", "Catatan", "Item", "Total Botol", "Total Harga", "Status"])
+    for d in docs:
+        items = "; ".join(f"{i.get('name', '')} x{i.get('qty', 0)}" for i in d.get("items", []))
+        qty = sum(i.get("qty", 0) for i in d.get("items", []))
+        created = d.get("created_at")
+        tanggal = created.strftime("%Y-%m-%d %H:%M") if isinstance(created, datetime) else str(created or "")
+        writer.writerow([tanggal, d.get("customer_name", ""), d.get("whatsapp", ""),
+                         d.get("address", ""), d.get("note", ""), items, qty,
+                         d.get("total", 0), d.get("status", "")])
+    filename = f"rekap-pesanan-{datetime.now(timezone.utc).strftime('%Y%m%d')}.csv"
+    return Response(content="\ufeff" + buf.getvalue(), media_type="text/csv",
+                    headers={"Content-Disposition": f"attachment; filename={filename}"})
+
+
 @api_router.patch("/orders/{order_id}", response_model=Order, response_model_by_alias=False)
 async def update_order_status(order_id: str, body: StatusUpdate, user=Depends(get_current_user)):
     if body.status not in ORDER_STATUSES:
@@ -573,6 +598,8 @@ DEFAULT_CONTENT = {
     "whatsapp_number": "081227646940",
     "price_display": "Rp 15.000",
     "unit_size": "350ml",
+    "pickup_address": "Lokasi pengambilan diinfokan saat konfirmasi WhatsApp",
+    "pickup_hours": "Setiap hari 08.00\u201320.00 WIB",
     "facts": [
         {"icon": "flask", "title": "Komposisi", "text": "Susu murni, gula, syrup/bubuk perisa. Tanpa pengawet maupun pemanis buatan."},
         {"icon": "snowflake", "title": "Penyimpanan", "text": "Simpan pada suhu 2\u20134\u00b0C agar kesegaran tetap terjaga."},
@@ -610,6 +637,12 @@ async def seed_content():
     elif "facts" not in existing:
         await db.site_content.update_one({"key": "landing"}, {"$set": {"facts": DEFAULT_CONTENT["facts"]}})
         logger.info("Product facts migrated")
+    if existing and "pickup_hours" not in existing:
+        await db.site_content.update_one({"key": "landing"}, {"$set": {
+            "pickup_address": DEFAULT_CONTENT["pickup_address"],
+            "pickup_hours": DEFAULT_CONTENT["pickup_hours"],
+        }})
+        logger.info("Pickup info migrated")
     if await db.testimonials.count_documents({}) == 0:
         for i, t in enumerate(DEFAULT_TESTIMONIALS):
             await db.testimonials.insert_one(Testimonial(order=i, **t).to_mongo())

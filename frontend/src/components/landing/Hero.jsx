@@ -33,10 +33,9 @@ export default function Hero({ content, flavors, onPickFlavor }) {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.6 }}
-            className="eyebrow mb-6 flex items-center gap-3 sm:mb-8"
+            className="eyebrow mb-6 flex items-center sm:mb-8"
             data-testid="hero-badge"
           >
-            <span className="h-px w-8 bg-[var(--pasture)]/60" />
             {content.tagline} · Botol {content.unit_size}
           </motion.p>
 

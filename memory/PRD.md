@@ -45,6 +45,12 @@ Landing page produk susu MilkyWay (susu sapi pasteurisasi 350ml) dengan 10 varia
 - Semua konten terkait pengantaran dihapus (heading, FAQ pengiriman, footer, manifesto, proses); status pesanan "Dikirim" diganti "Siap Diambil" (backend + filter admin)
 - Seksi Varian: background halaman bertransisi mengikuti warna rasa yang dipilih (mis. Strawberry → pink)
 
+## Iterasi 5 (10 Okt 2026)
+- Kartu "Pilih varian & jumlah" tampil cepat (animasi 0.4s tanpa delay/viewport margin)
+- Info Pengambilan di seksi Pesan: lokasi & jam pengambilan, field CMS baru (pickup_address, pickup_hours) — default "diinfokan via WhatsApp" sampai admin isi alamat asli
+- Ekspor CSV semua pesanan: GET /api/orders/export.csv (admin-only, BOM utk Excel) + tombol "Unduh CSV" di tab Pesanan
+- Nav diganti: Varian Rasa, Janji Kami, Proses, Testimoni, FAQ; eyebrow hero sejajar dengan judul
+
 ## Backlog
 - P0: (kosong — semua permintaan awal terpenuhi)
 - P1: upload gambar langsung (object storage) alih-alih URL; notifikasi email pesanan baru; edit konten Info Produk via CMS

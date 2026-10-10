@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Check, CheckCircle2, MessageCircle, Minus, Plus, ShoppingBag } from "lucide-react";
+import { Check, CheckCircle2, Clock, MapPin, MessageCircle, Minus, Plus, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 import { useCart } from "@/context/CartContext";
 import api, { formatApiError, formatRupiah, imgSrc, waLink } from "@/lib/api";
@@ -118,13 +118,40 @@ export default function OrderSection({ flavors, content }) {
               </p>
             </div>
           </motion.div>
+
+          {(content.pickup_address || content.pickup_hours) && (
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, ease: EASE }}
+              className="glass mt-4 rounded-[1.75rem] p-6"
+              data-testid="pickup-info"
+            >
+              <p className="eyebrow mb-4">Pengambilan Pesanan</p>
+              <div className="space-y-3 text-sm">
+                {content.pickup_address && (
+                  <p className="flex items-start gap-2.5 leading-relaxed text-[var(--ink)]/80">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[var(--pasture)]" />
+                    <span data-testid="pickup-address">{content.pickup_address}</span>
+                  </p>
+                )}
+                {content.pickup_hours && (
+                  <p className="flex items-start gap-2.5 leading-relaxed text-[var(--ink)]/80">
+                    <Clock className="mt-0.5 h-4 w-4 shrink-0 text-[var(--pasture)]" />
+                    <span data-testid="pickup-hours">{content.pickup_hours}</span>
+                  </p>
+                )}
+              </div>
+            </motion.div>
+          )}
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 32 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.7, delay: 0.15, ease: EASE }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, ease: EASE }}
           className="lg:col-span-7"
         >
           <div className="rounded-[2rem] border border-[var(--line)] bg-white p-6 shadow-[0_40px_80px_-50px_rgba(26,26,24,0.35)] sm:p-10">

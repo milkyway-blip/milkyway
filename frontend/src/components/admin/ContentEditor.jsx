@@ -181,6 +181,8 @@ export default function ContentEditor() {
         marquee_text: content.marquee_text,
         whatsapp_number: content.whatsapp_number,
         price_display: content.price_display,
+        pickup_address: content.pickup_address,
+        pickup_hours: content.pickup_hours,
         facts: content.facts || [],
       });
       toast.success("Konten landing page tersimpan");
@@ -252,6 +254,17 @@ export default function ContentEditor() {
             <div>
               <label className="mb-1 block text-xs font-bold text-brand-navy/60">Label Harga</label>
               <input value={content.price_display || ""} onChange={setC("price_display")} className={inputCls} data-testid="cms-price-display" />
+            </div>
+          </div>
+
+          <div className="grid gap-3.5 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs font-bold text-brand-navy/60">Lokasi Pengambilan</label>
+              <input value={content.pickup_address || ""} onChange={setC("pickup_address")} className={inputCls} data-testid="cms-pickup-address" />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-bold text-brand-navy/60">Jam Pengambilan</label>
+              <input value={content.pickup_hours || ""} onChange={setC("pickup_hours")} className={inputCls} data-testid="cms-pickup-hours" />
             </div>
           </div>
 

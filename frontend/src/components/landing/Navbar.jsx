@@ -3,10 +3,10 @@ import { useCart } from "@/context/CartContext";
 
 const LINKS = [
   { id: "varian", label: "Varian Rasa", testid: "nav-link-varian" },
-  { id: "manifesto", label: "Manifesto", testid: "nav-link-manifesto" },
+  { id: "manifesto", label: "Janji Kami", testid: "nav-link-janji" },
   { id: "proses", label: "Proses", testid: "nav-link-proses" },
-  { id: "info", label: "Info Produk", testid: "nav-link-info" },
   { id: "testimoni", label: "Testimoni", testid: "nav-link-testimoni" },
+  { id: "faq", label: "FAQ", testid: "nav-link-faq" },
 ];
 
 export default function Header({ content }) {

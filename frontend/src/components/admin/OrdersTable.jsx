@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Inbox, MapPin, MessageCircle, StickyNote } from "lucide-react";
+import { Download, Inbox, MapPin, MessageCircle, StickyNote } from "lucide-react";
 import { toast } from "sonner";
 import api, { formatRupiah, waLink } from "@/lib/api";
 
@@ -42,7 +42,8 @@ export default function OrdersTable() {
 
   return (
     <div className="space-y-5" data-testid="admin-orders">
-      <div className="flex flex-wrap items-center gap-2" data-testid="orders-filter">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2" data-testid="orders-filter">
         {FILTERS.map((f) => (
           <button
             key={f.id}
@@ -60,6 +61,15 @@ export default function OrdersTable() {
             </span>
           </button>
         ))}
+        </div>
+        <a
+          href={`${process.env.REACT_APP_BACKEND_URL}/api/orders/export.csv`}
+          className="inline-flex items-center gap-1.5 rounded-full border border-brand-navy/10 bg-white px-4 py-2 text-xs font-bold text-brand-navy/70 transition hover:border-brand-blue hover:text-brand-blue"
+          data-testid="orders-export-csv-btn"
+        >
+          <Download className="h-3.5 w-3.5" />
+          Unduh CSV
+        </a>
       </div>
 
       {filtered.length === 0 ? (
