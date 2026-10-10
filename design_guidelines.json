@@ -1,0 +1,165 @@
+{
+  "project_name": "MilkyWay - Susu Sapi Pasteurisasi 350ml",
+  "app_type": "landing_page_with_admin_dashboard",
+  "language": "Bahasa Indonesia",
+  "theme_archetype": "Organic & Earthy + Modern Minimalist",
+  "whatsapp_contact": "081227646940",
+  "price_per_unit": "Rp 15.000",
+  "unit_size": "350ml",
+  "color_palette": {
+    "background_light": "#FAF8F5",
+    "background_card": "#FFFFFF",
+    "primary_dark": "#1C2D27",
+    "accent_green": "#2E7D32",
+    "accent_sage": "#81C784",
+    "cream_highlight": "#FFF9E6",
+    "border_subtle": "#E5E7EB",
+    "text_main": "#1E293B",
+    "text_muted": "#64748B",
+    "flavors": {
+      "plain_zero_sugar": {
+        "name": "Plain Zero Sugar",
+        "bg_color": "#F8FAFC",
+        "border_color": "#CBD5E1",
+        "text_color": "#334155",
+        "badge": "0% Gula",
+        "image": "https://images.unsplash.com/photo-1639151082235-406d8eb262b9?crop=entropy&cs=srgb&fm=jpg&q=85"
+      },
+      "sweet_plain": {
+        "name": "Sweet Plain",
+        "bg_color": "#FEF3C7",
+        "border_color": "#FDE68A",
+        "text_color": "#92400E",
+        "badge": "Manis Alami",
+        "image": "https://images.unsplash.com/photo-1550583724-b2692b85b150?crop=entropy&cs=srgb&fm=jpg&q=85"
+      },
+      "vanilla": {
+        "name": "Vanilla",
+        "bg_color": "#FFFBEB",
+        "border_color": "#FCD34D",
+        "text_color": "#78350F",
+        "badge": "Aroma Pod Vanilla",
+        "image": "https://images.unsplash.com/photo-1634141510639-d691d86f47be?crop=entropy&cs=srgb&fm=jpg&q=85"
+      },
+      "melon": {
+        "name": "Melon",
+        "bg_color": "#DCFCE7",
+        "border_color": "#86EFAC",
+        "text_color": "#14532D",
+        "badge": "Hokkaido Melon",
+        "image": "https://images.unsplash.com/photo-1745594574342-3aa4d735d01e?crop=entropy&cs=srgb&fm=jpg&q=85"
+      },
+      "strawberry": {
+        "name": "Strawberry",
+        "bg_color": "#FCE7F3",
+        "border_color": "#FBCFE8",
+        "text_color": "#831843",
+        "badge": "Buah Stroberi Segar",
+        "image": "https://images.unsplash.com/photo-1751033390078-b605c8727fa4?crop=entropy&cs=srgb&fm=jpg&q=85"
+      },
+      "taro": {
+        "name": "Taro",
+        "bg_color": "#F3E8FF",
+        "border_color": "#E9D5FF",
+        "text_color": "#581C87",
+        "badge": "Taro Creamy",
+        "image": "https://images.unsplash.com/photo-1718210719889-75c2826ab482?crop=entropy&cs=srgb&fm=jpg&q=85"
+      },
+      "bubblegum": {
+        "name": "Bubblegum",
+        "bg_color": "#E0F2FE",
+        "border_color": "#BAE6FD",
+        "text_color": "#0C4A6E",
+        "badge": "Sensasi Manis Retro",
+        "image": "https://images.unsplash.com/photo-1771405317905-44d78aa82d3e?crop=entropy&cs=srgb&fm=jpg&q=85"
+      },
+      "hazelnut": {
+        "name": "Hazelnut",
+        "bg_color": "#FEF3C7",
+        "border_color": "#FCD34D",
+        "text_color": "#78350F",
+        "badge": "Nutty & Smooth",
+        "image": "https://images.unsplash.com/photo-1634141510639-d691d86f47be?crop=entropy&cs=srgb&fm=jpg&q=85"
+      },
+      "matcha": {
+        "name": "Matcha",
+        "bg_color": "#ECFDF5",
+        "border_color": "#A7F3D0",
+        "text_color": "#064E3B",
+        "badge": "Uji Matcha Premium",
+        "image": "https://images.unsplash.com/photo-1751033390078-b605c8727fa4?crop=entropy&cs=srgb&fm=jpg&q=85"
+      },
+      "chocolate": {
+        "name": "Chocolate",
+        "bg_color": "#FEF2F2",
+        "border_color": "#FECACA",
+        "text_color": "#7F1D1D",
+        "badge": "Belgian Cacao",
+        "image": "https://images.unsplash.com/photo-1718210719889-75c2826ab482?crop=entropy&cs=srgb&fm=jpg&q=85"
+      }
+    }
+  },
+  "typography": {
+    "heading_font": "Fraunces, Playfair Display, serif",
+    "body_font": "DM Sans, Outfit, sans-serif",
+    "h1": "text-4xl sm:text-5xl lg:text-6xl font-serif tracking-tight font-bold",
+    "h2": "text-2xl sm:text-3xl lg:text-4xl font-serif tracking-tight font-bold",
+    "h3": "text-xl sm:text-2xl font-serif font-semibold",
+    "body": "text-base leading-relaxed text-slate-700",
+    "small": "text-sm text-slate-500"
+  },
+  "layout_architecture": {
+    "landing_page": [
+      "Header / Floating Glass Navigation with Brand Logo SVG, nav links, Cart counter badge, and Admin panel toggle button",
+      "Kinetic Hero Section: Masked image entrance reveal animation, bold display headline 'Susu Sapi Pasteurisasi Murni, Segar Setiap Hari', bottle showcase, quick CTAs ('Pesan Sekarang', 'Lihat 10 Varian')",
+      "Editorial Marquee: Continuous drifting banner displaying '100% Susu Sapi Murni • Pasteurisasi Suhu Tepat • 10 Varian Rasa Premium • Tanpa Pengawet • Rp 15.000 / 350ml'",
+      "Flavor Showcase Section: 10 distinct milk flavor cards with hover micro-animations, color accent matching flavor, quantity controls, and 'Tambah ke Keranjang' quick action",
+      "Mix-Flavor Shopping Cart & Order Section: Floating or embedded cart builder. Pick multiple variants in one order, real-time price calculation (@ Rp 15.000/botol). Form inputs (Nama Lengkap, Nomor WhatsApp, Alamat Lengkap, Catatan). Action to save order to Database API and auto-redirect/open WhatsApp 081227646940 with pre-filled formatted order message",
+      "Bento Grid Quality & Farm Section: High-density feature bento showing Peternakan Murni, Sterilisasi Cold-Chain 4°C, 0% Pengawet, Kemasan Botol 350ml Higenis",
+      "Testimonial / Ulasan Pelanggan: Customer quotes with avatar badges and rating stars",
+      "Footer: Organic design with MilkyWay brand logo, direct WhatsApp CTA button (081227646940), social links, operating hours, and quick navigation"
+    ],
+    "admin_panel": [
+      "Admin Header & Navigation: Tab switcher between 'Overview Dashboard', 'Kelola Pesanan', 'Edit Konten Landing', and 'Live Chat Admin'",
+      "Overview Dashboard: Metric summary cards (Total Pesanan, Total Pendapatan, Pengunjung Hari Ini, Varian Terlaris) + Interactive daily traffic & orders chart using Recharts",
+      "Kelola Pesanan (Orders Table): Data table listing incoming orders with details (Order ID, Pelanggan, Phone, Varian & Jumlah, Total Harga, Tanggal, Status). Status dropdown/toggle to mark (Menunggu, Diproses, Dikirim, Selesai, Dibatalkan)",
+      "Edit Konten Landing Page: Admin CMS interface to update product photo, hero title, add new flavor, edit flavor name, price, badge, and upload/change flavor images",
+      "Live Chat Admin Panel: Simulated customer chat drawer allowing admin to respond to customer inquiries directly"
+    ]
+  },
+  "media_assets": {
+    "hero_milk_bottle": "https://images.unsplash.com/photo-1639151082235-406d8eb262b9?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "milk_splash": "https://images.unsplash.com/photo-1644346402970-d8d7304ff82f?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "dairy_farm_cows": "https://images.unsplash.com/photo-1500595046743-cd271d694d30?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "green_pasture": "https://images.unsplash.com/photo-1440428099904-c6d459a7e7b5?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "milk_pouring": "https://images.unsplash.com/photo-1550583724-b2692b85b150?crop=entropy&cs=srgb&fm=jpg&q=85"
+  },
+  "testing_attributes": {
+    "requirement": "All interactive elements and key text nodes MUST include data-testid in kebab-case format.",
+    "examples": [
+      "data-testid=\"nav-logo\"",
+      "data-testid=\"nav-cart-btn\"",
+      "data-testid=\"nav-admin-btn\"",
+      "data-testid=\"hero-cta-order\"",
+      "data-testid=\"flavor-card-strawberry\"",
+      "data-testid=\"add-to-cart-strawberry\"",
+      "data-testid=\"cart-qty-plus-strawberry\"",
+      "data-testid=\"order-form-name-input\"",
+      "data-testid=\"order-form-whatsapp-input\"",
+      "data-testid=\"order-form-address-input\"",
+      "data-testid=\"order-form-submit-btn\"",
+      "data-testid=\"whatsapp-direct-btn\"",
+      "data-testid=\"admin-tab-overview\"",
+      "data-testid=\"admin-tab-orders\"",
+      "data-testid=\"admin-tab-cms\"",
+      "data-testid=\"admin-order-status-select\""
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Build a high-craft Awwwards-level landing page for MilkyWay with an integrated admin panel.",
+    "Ensure all user choices are strictly respected: Bahasa Indonesia language, 350ml bottle, 10 milk flavors, price Rp 15.000 per bottle, WhatsApp 081227646940, strictly NO medical/health claims.",
+    "Implement the mix-flavor cart feature allowing buyers to mix multiple flavors with custom quantities in a single order, saving to backend API database and offering direct WhatsApp trigger.",
+    "Admin panel must support visitor stats chart, order status management, and landing page content editing.",
+    "All components must use modern Tailwind CSS styling, smooth transitions, and data-testid attributes."
+  ]
+}
