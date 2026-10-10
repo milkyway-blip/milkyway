@@ -12,8 +12,17 @@ module.exports = {
       fontFamily: {
         sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
         display: ['Fraunces', 'Georgia', 'serif'],
+        mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
       },
       colors: {
+        pasture: {
+          DEFAULT: '#0C4A34',
+          deep: '#093825',
+        },
+        gold: '#E5A823',
+        cream: '#FAF5EA',
+        milk: '#F2ECDC',
+        ink: '#1A1A18',
         brand: {
           blue: '#0196FF',
           deep: '#0177CC',

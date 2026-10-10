@@ -1,53 +1,64 @@
 import { ShoppingBag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 
-export default function Navbar({ content }) {
-  const { count, setOpen } = useCart();
+const LINKS = [
+  { id: "varian", label: "Varian Rasa", testid: "nav-link-varian" },
+  { id: "manifesto", label: "Manifesto", testid: "nav-link-manifesto" },
+  { id: "proses", label: "Proses", testid: "nav-link-proses" },
+  { id: "info", label: "Info Produk", testid: "nav-link-info" },
+  { id: "testimoni", label: "Testimoni", testid: "nav-link-testimoni" },
+];
+
+export default function Header({ content }) {
+  const { count } = useCart();
 
   const scrollTo = (id) =>
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
   return (
-    <header className="fixed inset-x-0 top-0 z-40 px-3 pt-3 sm:px-5" data-testid="navbar">
-      <div className="mx-auto flex max-w-7xl items-center justify-between rounded-2xl border border-white/60 bg-white/80 px-4 py-2.5 shadow-lg shadow-brand-navy/5 backdrop-blur-xl sm:px-6">
+    <header className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-3" data-testid="navbar">
+      <div className="pointer-events-auto flex w-full max-w-5xl items-center justify-between gap-2 rounded-full border border-[var(--line)] bg-[rgba(250,245,234,0.88)] py-2 pl-4 pr-2 shadow-[0_20px_50px_-30px_rgba(26,26,24,0.45)] backdrop-blur-xl sm:pl-5">
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="flex items-center gap-2"
+          className="flex shrink-0 items-center"
           data-testid="nav-logo"
           aria-label="MilkyWay beranda"
         >
-          <img src="/logo.png" alt={content.product_name || "MilkyWay"} className="h-8 w-auto sm:h-9" />
+          <img src="/logo.png" alt={content.product_name || "MilkyWay"} className="h-7 w-auto sm:h-8" />
         </button>
 
-        <nav className="hidden items-center gap-8 text-sm font-semibold text-brand-navy/70 md:flex">
-          <button onClick={() => scrollTo("varian")} className="transition-colors hover:text-brand-blue" data-testid="nav-link-varian">
-            Varian Rasa
-          </button>
-          <button onClick={() => scrollTo("kualitas")} className="transition-colors hover:text-brand-blue" data-testid="nav-link-kualitas">
-            Kualitas
-          </button>
+        <nav className="hidden items-center gap-6 text-[13px] font-medium text-[var(--ink)]/70 lg:flex">
+          {LINKS.map((l) => (
+            <button
+              key={l.id}
+              onClick={() => scrollTo(l.id)}
+              className="transition-colors hover:text-[var(--pasture)]"
+              data-testid={l.testid}
+            >
+              {l.label}
+            </button>
+          ))}
         </nav>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex shrink-0 items-center gap-2">
           <button
-            onClick={() => setOpen(true)}
-            className="relative rounded-full border border-brand-blue/20 bg-white p-2.5 text-brand-navy transition hover:border-brand-blue/50 hover:text-brand-blue"
+            onClick={() => scrollTo("pesan")}
+            className="flex items-center gap-2 rounded-full border border-[var(--line)] bg-white/70 px-3.5 py-2 text-xs font-semibold text-[var(--ink)] transition hover:border-[var(--pasture)]/40"
             data-testid="nav-cart-btn"
-            aria-label="Buka keranjang"
+            aria-label="Lihat keranjang"
           >
-            <ShoppingBag className="h-5 w-5" />
-            {count > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-blue px-1 text-[11px] font-bold text-white" data-testid="nav-cart-count">
-                {count}
-              </span>
-            )}
+            <ShoppingBag className="h-4 w-4" />
+            <span className="hidden sm:inline">Keranjang</span>
+            <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[var(--pasture)] px-1 text-[10px] font-bold text-[var(--cream)]" data-testid="nav-cart-count">
+              {count}
+            </span>
           </button>
           <button
-            onClick={() => scrollTo("varian")}
-            className="rounded-full bg-brand-blue px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-brand-blue/30 transition hover:bg-brand-deep active:scale-95"
+            onClick={() => scrollTo("pesan")}
+            className="btn-pill primary !px-5 !py-2.5 !text-xs"
             data-testid="nav-order-btn"
           >
-            Pesan
+            Pesan Sekarang
           </button>
         </div>
       </div>

@@ -1,47 +1,58 @@
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, MessageCircle, Sparkles } from "lucide-react";
-import { imgSrc, waLink } from "@/lib/api";
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { ArrowDown, Droplets, Thermometer } from "lucide-react";
+import { imgSrc } from "@/lib/api";
 
-export default function Hero({ content }) {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const yImg = useTransform(scrollYProgress, [0, 1], [0, 110]);
-  const yText = useTransform(scrollYProgress, [0, 1], [0, 50]);
+const EASE = [0.22, 1, 0.36, 1];
+
+export default function Hero({ content, flavors, onPickFlavor }) {
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  const onMove = (e) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    setTilt({
+      x: ((e.clientX - r.left) / r.width - 0.5) * 10,
+      y: ((e.clientY - r.top) / r.height - 0.5) * -10,
+    });
+  };
+
   const words = (content.hero_title || "").split(" ").filter(Boolean);
+  const commaIdx = words.findIndex((w) => w.includes(","));
 
-  const scrollToVarian = () =>
-    document.getElementById("varian")?.scrollIntoView({ behavior: "smooth" });
+  const scrollTo = (id) =>
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
   return (
-    <section ref={ref} className="relative overflow-hidden pb-14 pt-28 sm:pt-32 lg:pb-24 lg:pt-40" data-testid="hero-section">
-      <div className="pointer-events-none absolute -right-40 -top-40 h-[520px] w-[520px] rounded-full bg-brand-blue/10 blur-3xl" />
-      <div className="pointer-events-none absolute -left-52 top-1/3 h-[420px] w-[420px] rounded-full bg-brand-blue/10 blur-3xl" />
+    <section id="hero" className="relative overflow-hidden pb-16 pt-28 sm:pt-32 lg:min-h-screen lg:pb-20 lg:pt-36" data-testid="hero-section">
+      <div className="pointer-events-none absolute -left-40 -top-40 h-[42rem] w-[42rem] rounded-full bg-[radial-gradient(circle,rgba(229,168,35,0.20),transparent_60%)]" />
+      <div className="pointer-events-none absolute -right-52 top-1/3 h-[36rem] w-[36rem] rounded-full bg-[radial-gradient(circle,rgba(12,74,52,0.14),transparent_60%)]" />
 
-      <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 sm:px-8 lg:grid-cols-[1.1fr_0.9fr]">
-        <motion.div style={{ y: yText }}>
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
+      <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-6 lg:grid-cols-12 lg:gap-8 lg:px-12">
+        <div className="lg:col-span-7">
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.6 }}
-            className="inline-flex items-center gap-2 rounded-full border border-brand-blue/20 bg-white px-4 py-1.5 text-xs font-bold tracking-wide text-brand-deep shadow-sm"
+            transition={{ delay: 0.1, duration: 0.6 }}
+            className="eyebrow mb-6 flex items-center gap-3 sm:mb-8"
             data-testid="hero-badge"
           >
-            <Sparkles className="h-3.5 w-3.5 text-brand-blue" />
-            {content.tagline} • {content.unit_size}
-          </motion.div>
+            <span className="h-px w-8 bg-[var(--pasture)]/60" />
+            {content.tagline} · Botol {content.unit_size}
+          </motion.p>
 
           <h1
-            className="mt-6 font-display text-4xl font-semibold leading-[1.06] tracking-tight text-brand-navy sm:text-5xl lg:text-6xl"
+            className="font-display text-4xl font-medium leading-[1.04] tracking-[-0.03em] text-[var(--ink)] sm:text-5xl lg:text-6xl xl:text-7xl"
             data-testid="hero-title"
           >
             {words.map((w, i) => (
-              <span key={i} className="-mb-1 inline-block overflow-hidden pb-1 align-bottom">
+              <span key={i} className="reveal-word">
                 <motion.span
-                  className="inline-block"
+                  className={`inline-block ${
+                    commaIdx !== -1 && i > commaIdx ? "font-light italic text-[var(--pasture)]" : ""
+                  }`}
                   initial={{ y: "110%" }}
                   animate={{ y: 0 }}
-                  transition={{ delay: 0.25 + i * 0.055, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ delay: 0.2 + i * 0.05, duration: 0.75, ease: EASE }}
                 >
                   {w}
                   {i < words.length - 1 ? "\u00A0" : ""}
@@ -51,100 +62,123 @@ export default function Hero({ content }) {
           </h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 18 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 0.6 }}
-            className="mt-5 max-w-xl text-base leading-relaxed text-brand-navy/60 sm:text-lg"
+            className="mt-6 max-w-xl text-base leading-relaxed text-[var(--ink-muted)] sm:mt-8 md:text-lg"
             data-testid="hero-subtitle"
           >
             {content.hero_subtitle}
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 18 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.85, duration: 0.6 }}
-            className="mt-8 flex flex-wrap items-center gap-3"
+            className="mt-8 flex flex-wrap items-center gap-3 sm:mt-10 sm:gap-4"
           >
-            <button
-              onClick={scrollToVarian}
-              className="group inline-flex items-center gap-2 rounded-full bg-brand-blue px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-brand-blue/30 transition hover:bg-brand-deep active:scale-95"
-              data-testid="hero-cta-order"
-            >
+            <button onClick={() => scrollTo("pesan")} className="btn-pill primary" data-testid="hero-cta-order">
               Pesan Sekarang
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <ArrowDown className="h-4 w-4" />
             </button>
-            <a
-              href={waLink(content.whatsapp_number, "Halo MilkyWay! Saya mau tanya-tanya dulu.")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-brand-navy/15 bg-white px-7 py-3.5 text-sm font-bold text-brand-navy transition hover:border-brand-blue/40 hover:text-brand-blue active:scale-95"
-              data-testid="hero-cta-wa"
+            <button onClick={() => scrollTo("varian")} className="btn-pill ghost" data-testid="hero-cta-flavors">
+              Lihat {flavors.length} Varian
+            </button>
+          </motion.div>
+
+          <div className="mt-10 flex flex-wrap gap-2 sm:mt-14" data-testid="hero-flavor-dots">
+            {flavors.map((f, i) => (
+              <motion.button
+                key={f.id}
+                initial={{ opacity: 0, scale: 0.6 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 1 + i * 0.05, duration: 0.4, ease: EASE }}
+                onClick={() => onPickFlavor(f.key)}
+                className="group flex items-center gap-2 rounded-full border border-[var(--line)] bg-white/70 py-1.5 pl-1.5 pr-3 text-xs font-medium transition hover:border-[var(--pasture)]/40"
+                data-testid={`hero-flavor-${f.key}`}
+                title={f.name}
+              >
+                <span
+                  className="h-5 w-5 rounded-full border border-black/10"
+                  style={{ background: f.bg_color, borderColor: f.border_color }}
+                />
+                {f.name}
+              </motion.button>
+            ))}
+          </div>
+        </div>
+
+        <div
+          className="relative lg:col-span-5"
+          style={{ perspective: 1200 }}
+          onMouseMove={onMove}
+          onMouseLeave={() => setTilt({ x: 0, y: 0 })}
+        >
+          <div
+            className="transition-transform duration-200 ease-out"
+            style={{ transform: `rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`, transformStyle: "preserve-3d" }}
+          >
+            <motion.div
+              initial={{ opacity: 0, rotate: -10, y: 40 }}
+              animate={{ opacity: 1, rotate: -6, y: 0 }}
+              transition={{ delay: 0.45, duration: 0.9, ease: EASE }}
+              className="relative mx-auto aspect-[3/4] w-[82%] max-w-md overflow-hidden rounded-[2.4rem] shadow-[0_50px_100px_-40px_rgba(26,26,24,0.45)] sm:w-[70%] lg:w-full"
+              data-testid="hero-bottle-card"
             >
-              <MessageCircle className="h-4 w-4" />
-              Chat WhatsApp
-            </a>
-          </motion.div>
+              <img
+                src={imgSrc(content.hero_image)}
+                alt={`${content.product_name} ${content.unit_size}`}
+                className="absolute inset-0 h-full w-full object-cover"
+                data-testid="hero-image"
+              />
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_35%_25%,rgba(255,255,255,0.35),transparent_55%)]" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[rgba(12,74,52,0.65)] via-transparent to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-6 text-[var(--cream)]">
+                <div>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] opacity-80">Batch Pagi</p>
+                  <p className="mt-1 font-display text-2xl font-medium leading-none">{content.unit_size}</p>
+                </div>
+                <div className="text-right font-mono text-[10px] uppercase tracking-[0.2em] opacity-80">
+                  Tanpa
+                  <br />
+                  Pengawet
+                </div>
+              </div>
+            </motion.div>
+          </div>
 
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.05, duration: 0.8 }}
-            className="mt-10 flex items-center gap-8 text-sm"
-            data-testid="hero-stats"
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1, duration: 0.7, ease: EASE }}
+            className="glass float-slow absolute -left-2 top-8 flex items-center gap-3 rounded-2xl px-4 py-3 shadow-lg sm:left-0 sm:top-10"
+            data-testid="hero-badge-temp"
           >
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--gold)]/20 text-[var(--gold)]">
+              <Thermometer className="h-[18px] w-[18px]" />
+            </span>
             <div>
-              <p className="font-display text-2xl font-bold text-brand-navy">10</p>
-              <p className="text-brand-navy/50">Varian Rasa</p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--ink-muted)]">Pasteurisasi</p>
+              <p className="font-display text-lg font-semibold leading-none">Suhu Tepat</p>
             </div>
-            <div className="h-10 w-px bg-brand-navy/10" />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1.15, duration: 0.7, ease: EASE }}
+            className="glass float-slow absolute -right-2 bottom-14 flex items-center gap-3 rounded-2xl px-4 py-3 shadow-lg [animation-delay:1.5s] sm:right-0 sm:bottom-16"
+            data-testid="hero-badge-fresh"
+          >
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--pasture)]/10 text-[var(--pasture)]">
+              <Droplets className="h-[18px] w-[18px]" />
+            </span>
             <div>
-              <p className="font-display text-2xl font-bold text-brand-navy">{content.price_display}</p>
-              <p className="text-brand-navy/50">per Botol {content.unit_size}</p>
-            </div>
-            <div className="h-10 w-px bg-brand-navy/10" />
-            <div>
-              <p className="font-display text-2xl font-bold text-brand-navy">Campur</p>
-              <p className="text-brand-navy/50">Rasa Sesukamu</p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--ink-muted)]">Rantai Dingin</p>
+              <p className="font-display text-lg font-semibold leading-none">Selalu 2–4°C</p>
             </div>
           </motion.div>
-        </motion.div>
-
-        <motion.div style={{ y: yImg }} className="relative mx-auto w-full max-w-xs sm:max-w-sm">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.94, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ delay: 0.45, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden rounded-b-[2.5rem] rounded-t-[999px] border-8 border-white shadow-2xl shadow-brand-blue/25"
-          >
-            <img
-              src={imgSrc(content.hero_image)}
-              alt={`${content.product_name} ${content.unit_size}`}
-              className="aspect-[3/4] w-full object-cover"
-              data-testid="hero-image"
-            />
-          </motion.div>
-
-          <motion.div
-            animate={{ y: [0, -10, 0] }}
-            transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-            className="absolute -left-4 bottom-10 rounded-2xl border border-white/70 bg-white/90 px-4 py-3 shadow-xl backdrop-blur sm:-left-10"
-            data-testid="hero-price-chip"
-          >
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-brand-navy/50">Harga</p>
-            <p className="font-display text-lg font-bold text-brand-blue">{content.price_display}</p>
-          </motion.div>
-
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 0.6 }}
-            className="absolute -right-3 top-12 rounded-2xl border border-white/70 bg-white/90 px-4 py-3 shadow-xl backdrop-blur sm:-right-8"
-            data-testid="hero-variant-chip"
-          >
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-brand-navy/50">Varian</p>
-            <p className="font-display text-lg font-bold text-brand-navy">10 Rasa</p>
-          </motion.div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

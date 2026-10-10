@@ -33,6 +33,12 @@ Landing page produk susu MilkyWay (susu sapi pasteurisasi 350ml) dengan 10 varia
 - Testimoni pelanggan: koleksi testimonials, CRUD admin (rating bintang, sembunyikan/tampilkan), seksi Testimoni di landing
 - API baru: /api/upload, /api/files/{path}, /api/testimonials (GET/POST/PUT/DELETE)
 
+## Iterasi 3 (10 Okt 2026) — Rombak total desain landing
+- Meniru desain referensi susu-botol.preview.emergentagent.com: palet krim + hijau pasture (#0C4A34) + aksen emas (#E5A823), Fraunces + DM Sans + IBM Plex Mono
+- Struktur baru: header pill mengambang → hero (masked reveal, aksen italic hijau, kartu botol 3D tilt + badge kaca, chips varian) → marquee editorial → showcase varian model tab → manifesto 01–04 → seksi Proses hijau gelap (Pagi/Presisi/2–4°C/350ml) → marquee hijau → Info Produk (DB) → Testimoni (DB) → FAQ akordeon → seksi Pesan (ringkasan keranjang kaca + daftar stepper semua varian + form → WA) → footer hijau tua
+- CartDrawer & BentoSection dihapus; keranjang kini inline di seksi #pesan (state tetap CartContext + localStorage)
+- Panel admin tidak berubah (tetap palet biru brand)
+
 ## Backlog
 - P0: (kosong — semua permintaan awal terpenuhi)
 - P1: upload gambar langsung (object storage) alih-alih URL; notifikasi email pesanan baru; edit konten Info Produk via CMS
