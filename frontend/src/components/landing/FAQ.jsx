@@ -14,12 +14,8 @@ const FAQS = [
     a: "Tidak ada. Pesan satu botol pun bisa, dan kamu bebas campur berbagai varian rasa dalam satu pesanan.",
   },
   {
-    q: "Bagaimana pengirimannya?",
-    a: "Pesanan dikirim dalam keadaan dingin pada jam operasional 08.00–20.00 WIB. Detail ongkir dan jadwal dikonfirmasi lewat WhatsApp.",
-  },
-  {
     q: "Berapa lama susu bisa disimpan?",
-    a: "Masa simpan 1,5 minggu di dalam kulkas pada suhu 2–4°C, dan tahan hingga 6 jam di suhu ruang. Segera dinginkan kembali setelah diterima.",
+    a: "Masa simpan 1,5 minggu di dalam kulkas pada suhu 2–4°C, dan tahan hingga 6 jam di suhu ruang. Sebaiknya langsung masuk kulkas begitu tiba di rumah.",
   },
 ];
 

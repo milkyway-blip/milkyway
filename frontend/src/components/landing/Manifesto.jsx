@@ -16,7 +16,7 @@ const CHAPTERS = [
   {
     n: "03",
     title: "Rantai dingin yang tidak pernah putus.",
-    body: "Dari tangki pendingin, botol, hingga kurir kami — semuanya terjaga di 2–4°C. Karena susu segar hanya layak disebut segar jika suhunya konsisten sampai ke tanganmu.",
+    body: "Dari tangki pendingin hingga botol yang disegel — semuanya terjaga di 2–4°C. Karena susu segar hanya layak disebut segar jika suhunya konsisten.",
   },
   {
     n: "04",

@@ -39,6 +39,12 @@ Landing page produk susu MilkyWay (susu sapi pasteurisasi 350ml) dengan 10 varia
 - CartDrawer & BentoSection dihapus; keranjang kini inline di seksi #pesan (state tetap CartContext + localStorage)
 - Panel admin tidak berubah (tetap palet biru brand)
 
+## Iterasi 4 (10 Okt 2026)
+- Lag seksi Pesan diperbaiki: blob blur-3xl diganti radial-gradient ringan, gambar varian lazy-load
+- Admin dirapikan & diselaraskan ke palet baru (krim/pasture/emas) via remap palet tailwind + warna chart
+- Semua konten terkait pengantaran dihapus (heading, FAQ pengiriman, footer, manifesto, proses); status pesanan "Dikirim" diganti "Siap Diambil" (backend + filter admin)
+- Seksi Varian: background halaman bertransisi mengikuti warna rasa yang dipilih (mis. Strawberry → pink)
+
 ## Backlog
 - P0: (kosong — semua permintaan awal terpenuhi)
 - P1: upload gambar langsung (object storage) alih-alih URL; notifikasi email pesanan baru; edit konten Info Produk via CMS

@@ -134,7 +134,7 @@ function FlavorModal({ initial, onClose, onSaved }) {
               type="checkbox"
               checked={!!f.active}
               onChange={(e) => set("active", e.target.checked)}
-              className="h-4 w-4 accent-[#0196FF]"
+              className="h-4 w-4 accent-[#0C4A34]"
               data-testid="flavor-form-active"
             />
             Tampilkan di landing page

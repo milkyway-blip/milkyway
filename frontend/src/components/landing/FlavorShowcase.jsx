@@ -31,7 +31,7 @@ export default function FlavorShowcase({ flavors, unitSize, selectedKey, onSelec
   };
 
   return (
-    <section id="varian" className="relative py-20 sm:py-28 lg:py-36" data-testid="flavor-section">
+    <section id="varian" className="relative py-20 transition-[background-color] duration-700 sm:py-28 lg:py-36" style={{ backgroundColor: active.bg_color }} data-testid="flavor-section">
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
         <motion.div
           initial={{ opacity: 0, y: 32 }}
@@ -90,8 +90,7 @@ export default function FlavorShowcase({ flavors, unitSize, selectedKey, onSelec
             data-testid="flavor-detail"
           >
             <div
-              className="relative aspect-[5/4] overflow-hidden rounded-[2rem] border border-[var(--line)] shadow-[0_40px_80px_-50px_rgba(26,26,24,0.35)]"
-              style={{ backgroundColor: active.bg_color }}
+              className="relative aspect-[5/4] overflow-hidden rounded-[2rem] border border-black/10 bg-white shadow-[0_40px_80px_-50px_rgba(26,26,24,0.35)]"
             >
               {active.image && (
                 <img

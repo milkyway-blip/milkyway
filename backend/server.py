@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 PyObjectId = Annotated[str, BeforeValidator(str)]
 JWT_ALGORITHM = "HS256"
-ORDER_STATUSES = ["baru", "diproses", "dikirim", "selesai", "dibatalkan"]
+ORDER_STATUSES = ["baru", "diproses", "siap_diambil", "selesai", "dibatalkan"]
 
 # ---------- Object storage (Emergent) ----------
 STORAGE_BASE = (os.environ.get("INTEGRATION_PROXY_URL") or "").strip() or "https://integrations.emergentagent.com"

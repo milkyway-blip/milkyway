@@ -19,7 +19,7 @@ const STEPS = [
     n: "03",
     value: "2–4°C",
     title: "Rantai Dingin",
-    body: "Suhu dingin terjaga konsisten dari tangki penyimpanan sampai pengiriman.",
+    body: "Suhu dingin terjaga konsisten dari tangki penyimpanan sampai botol disegel.",
   },
   {
     n: "04",

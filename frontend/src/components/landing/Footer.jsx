@@ -14,7 +14,7 @@ export default function Footer({ content }) {
             <img src="/logo.png" alt={content.product_name} className="h-8 w-auto" />
           </div>
           <p className="mt-5 max-w-sm font-display text-2xl font-light leading-snug text-[var(--cream)]/90">
-            {content.tagline} — segar setiap hari, diantar dingin sampai depan pintu.
+            {content.tagline} — segar setiap hari, langsung dari peternakan.
           </p>
           <a
             href={waLink(content.whatsapp_number, "Halo MilkyWay! Saya mau pesan susu.")}
@@ -71,7 +71,7 @@ export default function Footer({ content }) {
             </div>
           </div>
           <p className="mt-5 text-sm leading-relaxed text-[var(--cream)]/50">
-            Pesanan dikonfirmasi melalui WhatsApp dan dikirim dalam keadaan dingin.
+            Pesanan dikonfirmasi melalui WhatsApp.
           </p>
         </div>
       </div>

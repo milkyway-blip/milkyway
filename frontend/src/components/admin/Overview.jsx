@@ -61,8 +61,8 @@ export default function Overview() {
               <AreaChart data={traffic} margin={{ top: 5, right: 8, left: -18, bottom: 0 }}>
                 <defs>
                   <linearGradient id="gradVisits" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#0196FF" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#0196FF" stopOpacity={0.02} />
+                    <stop offset="0%" stopColor="#0C4A34" stopOpacity={0.3} />
+                    <stop offset="100%" stopColor="#0C4A34" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E8F0F7" vertical={false} />
@@ -79,8 +79,8 @@ export default function Overview() {
                   labelFormatter={(d) => `Tanggal ${d}`}
                   contentStyle={{ borderRadius: 14, border: "1px solid #E8F0F7", fontSize: 12 }}
                 />
-                <Area type="monotone" dataKey="visits" name="visits" stroke="#0196FF" strokeWidth={2.5} fill="url(#gradVisits)" />
-                <Area type="monotone" dataKey="orders" name="orders" stroke="#0A2440" strokeWidth={2} fill="none" />
+                <Area type="monotone" dataKey="visits" name="visits" stroke="#0C4A34" strokeWidth={2.5} fill="url(#gradVisits)" />
+                <Area type="monotone" dataKey="orders" name="orders" stroke="#E5A823" strokeWidth={2} fill="none" />
               </AreaChart>
             </ResponsiveContainer>
           </div>

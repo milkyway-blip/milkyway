@@ -60,7 +60,7 @@ export default function OrderSection({ flavors, content }) {
 
   return (
     <section id="pesan" className="relative overflow-hidden bg-[var(--milk-2)] py-24 lg:py-36" data-testid="order-section">
-      <div className="pointer-events-none absolute -right-32 -top-32 h-[34rem] w-[34rem] rounded-full bg-[var(--gold)] opacity-25 blur-3xl" />
+      <div className="pointer-events-none absolute -right-32 -top-32 h-[34rem] w-[34rem] rounded-full bg-[radial-gradient(circle,rgba(229,168,35,0.22),transparent_60%)]" />
 
       <div className="relative mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-12 lg:gap-14 lg:px-12">
         <div className="lg:col-span-5">
@@ -72,7 +72,7 @@ export default function OrderSection({ flavors, content }) {
           >
             <p className="eyebrow mb-5">Pesan Sekarang</p>
             <h2 className="font-display text-3xl font-medium leading-[1.05] tracking-tight sm:text-4xl lg:text-5xl">
-              Dingin segar, <em className="font-light italic text-[var(--pasture)]">diantar</em> ke rumahmu.
+              Dingin segar, <em className="font-light italic text-[var(--pasture)]">siap</em> kamu nikmati.
             </h2>
             <p className="mt-6 max-w-md text-base leading-relaxed text-[var(--ink-muted)] md:text-lg">
               Campur varian sesukamu dalam satu pesanan. Kami simpan pesananmu, lalu konfirmasi lewat WhatsApp.
@@ -173,7 +173,7 @@ export default function OrderSection({ flavors, content }) {
                             className="h-14 w-11 shrink-0 overflow-hidden rounded-xl border border-[var(--line)] sm:h-16 sm:w-12"
                             style={{ backgroundColor: f.bg_color }}
                           >
-                            {f.image && <img src={imgSrc(f.image)} alt={f.name} className="h-full w-full object-cover" />}
+                            {f.image && <img src={imgSrc(f.image)} alt={f.name} loading="lazy" className="h-full w-full object-cover" />}
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-sm font-semibold">{f.name}</p>
@@ -214,8 +214,8 @@ export default function OrderSection({ flavors, content }) {
                   <input required minLength={2} value={form.name} onChange={set("name")} className="field" placeholder="Nama lengkap" data-testid="order-form-name-input" />
                   <input required minLength={8} type="tel" value={form.whatsapp} onChange={set("whatsapp")} className="field" placeholder="Nomor WhatsApp (08xx)" data-testid="order-form-whatsapp-input" />
                 </div>
-                <textarea required minLength={5} rows={2} value={form.address} onChange={set("address")} className="field resize-none" placeholder="Alamat pengiriman lengkap" data-testid="order-form-address-input" />
-                <textarea rows={2} value={form.note} onChange={set("note")} className="field resize-none" placeholder="Catatan (opsional): jam pengiriman, patokan alamat, dll." data-testid="order-form-note-input" />
+                <textarea required minLength={5} rows={2} value={form.address} onChange={set("address")} className="field resize-none" placeholder="Alamat lengkap" data-testid="order-form-address-input" />
+                <textarea rows={2} value={form.note} onChange={set("note")} className="field resize-none" placeholder="Catatan (opsional): patokan alamat, waktu pengambilan, dll." data-testid="order-form-note-input" />
 
                 <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
                   <div>

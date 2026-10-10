@@ -101,7 +101,7 @@ function TestimonialModal({ initial, onClose, onSaved }) {
               type="checkbox"
               checked={!!t.active}
               onChange={(e) => setT((p) => ({ ...p, active: e.target.checked }))}
-              className="h-4 w-4 accent-[#0196FF]"
+              className="h-4 w-4 accent-[#0C4A34]"
               data-testid="testimonial-form-active"
             />
             Tampilkan di landing page
