@@ -89,6 +89,11 @@ def to_object_id(oid: str) -> ObjectId:
 
 
 # ---------- Models ----------
+class Size(BaseModel):
+    label: str
+    price: int = 15000
+
+
 class Flavor(BaseDocument):
     key: str
     name: str
@@ -101,6 +106,7 @@ class Flavor(BaseDocument):
     active: bool = True
     order: int = 0
     stock: Optional[int] = None
+    size_prices: List[Size] = Field(default_factory=list)
 
 
 class FlavorInput(BaseModel):
@@ -113,17 +119,13 @@ class FlavorInput(BaseModel):
     price: int = 15000
     active: bool = True
     stock: Optional[int] = None
+    size_prices: List[Size] = Field(default_factory=list)
 
 
 class Fact(BaseModel):
     icon: str = "shield"
     title: str = ""
     text: str = ""
-
-
-class Size(BaseModel):
-    label: str
-    price: int = 15000
 
 
 class ManifestoItem(BaseModel):
@@ -386,7 +388,11 @@ async def create_order(body: OrderInput):
         if stock is not None and per_flavor[it.flavor_id] > stock:
             raise HTTPException(status_code=400, detail=f"Stok {fl['name']} tersisa {stock}")
         qty = max(1, min(it.qty, 99))
-        price = (size_price.get(it.size) or int(fl.get("price", 15000))) if it.size else int(fl.get("price", 15000))
+        fl_size_price = {s["label"]: int(s["price"]) for s in fl.get("size_prices", [])}
+        if it.size:
+            price = fl_size_price.get(it.size) or size_price.get(it.size) or int(fl.get("price", 15000))
+        else:
+            price = int(fl.get("price", 15000))
         items.append(OrderItem(flavor_id=str(fl["_id"]), name=fl["name"], size=it.size, qty=qty, price=price))
         total += price * qty
     order = Order(customer_name=body.customer_name.strip(), whatsapp=body.whatsapp.strip(),

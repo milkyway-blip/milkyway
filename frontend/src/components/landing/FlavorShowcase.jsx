@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useCart } from "@/context/CartContext";
-import { formatRupiah, imgSrc } from "@/lib/api";
+import { formatRupiah, imgSrc, priceFor } from "@/lib/api";
 
 const EASE = [0.22, 1, 0.36, 1];
 
@@ -14,7 +14,7 @@ export default function FlavorShowcase({ flavors, unitSize, sizes = [], selected
 
   if (!flavors.length) return null;
   const active = flavors.find((f) => f.key === selectedKey) || flavors[0];
-  const unitPrice = sizes.find((s) => s.label === size)?.price ?? active.price;
+  const unitPrice = priceFor(active, sizes, size);
 
   const pick = (key) => {
     onSelect(key);

@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Check, CheckCircle2, Clock, MapPin, MessageCircle, Minus, Plus, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 import { useCart } from "@/context/CartContext";
-import api, { formatApiError, formatRupiah, imgSrc, waLink } from "@/lib/api";
+import api, { formatApiError, formatRupiah, imgSrc, priceFor, waLink } from "@/lib/api";
 
 const EASE = [0.22, 1, 0.36, 1];
 
@@ -28,7 +28,7 @@ function FlavorRow({ f, sizes }) {
   const [size, setSize] = useState(
     sizes.find((s) => s.label === "350ml")?.label || sizes[0]?.label || "",
   );
-  const unitPrice = sizes.find((s) => s.label === size)?.price ?? f.price;
+  const unitPrice = priceFor(f, sizes, size);
   const id = size ? `${f.id}|${size}` : f.id;
   const q = items.find((i) => i.id === id)?.qty || 0;
   const flavorQty = items

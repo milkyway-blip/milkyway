@@ -38,6 +38,11 @@ export const waLink = (number, text) => {
   return `https://wa.me/${intl}?text=${encodeURIComponent(text)}`;
 };
 
+export const priceFor = (flavor, sizes, label) => {
+  const override = (flavor?.size_prices || []).find((s) => s.label === label)?.price;
+  return override ?? sizes.find((s) => s.label === label)?.price ?? flavor?.price ?? 0;
+};
+
 export const imgSrc = (u) =>
   u && u.startsWith("/api/") ? `${process.env.REACT_APP_BACKEND_URL}${u}` : u;
 

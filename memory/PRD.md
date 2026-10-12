@@ -74,6 +74,10 @@ Landing page produk susu MilkyWay (susu sapi pasteurisasi 350ml) dengan 10 varia
 - Logo landing (navbar/footer/favicon) bisa diganti via CMS field logo_image (fallback /logo.png); link Masuk Admin di footer dihapus
 - Anti-lag seksi Pesan: kartu ringkasan/pickup tanpa backdrop-blur, kartu form tanpa animasi entrance
 
+## Iterasi 10 (12 Okt 2026)
+- Harga ukuran asli: 250ml=14rb, 350ml=15rb, 500ml=18rb, 1L=30rb (via CMS sizes)
+- Harga khusus per varian per ukuran: field size_prices di Flavor, editor 4 input di modal varian (kosong = ikut harga global), resolusi harga: override varian > harga global ukuran > harga varian; helper priceFor di lib/api.js
+
 ## Backlog
 - P0: (kosong — semua permintaan awal terpenuhi)
 - P1: upload gambar langsung (object storage) alih-alih URL; notifikasi email pesanan baru; edit konten Info Produk via CMS

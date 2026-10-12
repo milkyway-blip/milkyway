@@ -18,10 +18,16 @@ const emptyFlavor = {
   active: true,
 };
 
-function FlavorModal({ initial, onClose, onSaved }) {
+function FlavorModal({ initial, onClose, onSaved, sizes = [] }) {
   const [f, setF] = useState(initial);
   const [saving, setSaving] = useState(false);
   const set = (k, v) => setF((prev) => ({ ...prev, [k]: v }));
+  const setSizePrice = (label, val) =>
+    setF((prev) => {
+      const list = (prev.size_prices || []).filter((x) => x.label !== label);
+      if (val !== "" && !isNaN(parseInt(val, 10))) list.push({ label, price: parseInt(val, 10) });
+      return { ...prev, size_prices: list };
+    });
 
   const save = async () => {
     if (!f.name.trim()) {
@@ -39,6 +45,7 @@ function FlavorModal({ initial, onClose, onSaved }) {
       text_color: f.text_color,
       active: !!f.active,
       stock: f.stock === null || f.stock === undefined || f.stock === "" ? null : parseInt(f.stock, 10),
+      size_prices: (f.size_prices || []).filter((x) => x.label && x.price > 0),
     };
     try {
       if (f.id) await api.put(`/flavors/${f.id}`, payload);
@@ -136,6 +143,33 @@ function FlavorModal({ initial, onClose, onSaved }) {
             </div>
           </div>
           <p className="-mt-1 text-[11px] text-brand-navy/40">Kosongkan stok jika tidak dibatasi. Isi 0 untuk menandai habis.</p>
+          {sizes.length > 0 && (
+            <div className="rounded-2xl border border-brand-navy/10 p-3.5">
+              <label className="mb-2 block text-xs font-bold text-brand-navy/60">
+                Harga khusus per ukuran (opsional)
+              </label>
+              <div className="grid grid-cols-2 gap-2.5">
+                {sizes.map((s) => {
+                  const cur = (f.size_prices || []).find((x) => x.label === s.label);
+                  return (
+                    <div key={s.label} className="flex items-center gap-2">
+                      <span className="w-14 shrink-0 font-mono text-[11px] text-brand-navy/50">{s.label}</span>
+                      <input
+                        type="number"
+                        min="0"
+                        value={cur?.price ?? ""}
+                        placeholder={`${s.price}`}
+                        onChange={(e) => setSizePrice(s.label, e.target.value)}
+                        className="w-full rounded-xl border border-brand-navy/10 px-3 py-2 text-sm outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
+                        data-testid={`flavor-size-price-${s.label}`}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="mt-2 text-[11px] text-brand-navy/40">Kosongkan untuk mengikuti harga global ukuran.</p>
+            </div>
+          )}
           <div>
             <label className="mb-1 block text-xs font-bold text-brand-navy/60">Foto Varian</label>
             <ImageUpload value={f.image} onChange={(url) => set("image", url)} testid="flavor-form-image" />
@@ -436,7 +470,7 @@ export default function ContentEditor() {
 
       <AnimatePresence>
         {editing && (
-          <FlavorModal initial={editing} onClose={() => setEditing(null)} onSaved={loadFlavors} />
+          <FlavorModal initial={editing} onClose={() => setEditing(null)} onSaved={loadFlavors} sizes={content.sizes || []} />
         )}
       </AnimatePresence>
     </div>
