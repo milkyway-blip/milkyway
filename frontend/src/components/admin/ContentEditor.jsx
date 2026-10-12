@@ -18,10 +18,16 @@ const emptyFlavor = {
   active: true,
 };
 
-function FlavorModal({ initial, onClose, onSaved }) {
+function FlavorModal({ initial, onClose, onSaved, sizes = [] }) {
   const [f, setF] = useState(initial);
   const [saving, setSaving] = useState(false);
   const set = (k, v) => setF((prev) => ({ ...prev, [k]: v }));
+  const setSizePrice = (label, val) =>
+    setF((prev) => {
+      const list = (prev.size_prices || []).filter((x) => x.label !== label);
+      if (val !== "" && !isNaN(parseInt(val, 10))) list.push({ label, price: parseInt(val, 10) });
+      return { ...prev, size_prices: list };
+    });
 
   const save = async () => {
     if (!f.name.trim()) {
@@ -39,6 +45,7 @@ function FlavorModal({ initial, onClose, onSaved }) {
       text_color: f.text_color,
       active: !!f.active,
       stock: f.stock === null || f.stock === undefined || f.stock === "" ? null : parseInt(f.stock, 10),
+      size_prices: (f.size_prices || []).filter((x) => x.label && x.price > 0),
     };
     try {
       if (f.id) await api.put(`/flavors/${f.id}`, payload);
@@ -136,6 +143,33 @@ function FlavorModal({ initial, onClose, onSaved }) {
             </div>
           </div>
           <p className="-mt-1 text-[11px] text-brand-navy/40">Kosongkan stok jika tidak dibatasi. Isi 0 untuk menandai habis.</p>
+          {sizes.length > 0 && (
+            <div className="rounded-2xl border border-brand-navy/10 p-3.5">
+              <label className="mb-2 block text-xs font-bold text-brand-navy/60">
+                Harga khusus per ukuran (opsional)
+              </label>
+              <div className="grid grid-cols-2 gap-2.5">
+                {sizes.map((s) => {
+                  const cur = (f.size_prices || []).find((x) => x.label === s.label);
+                  return (
+                    <div key={s.label} className="flex items-center gap-2">
+                      <span className="w-14 shrink-0 font-mono text-[11px] text-brand-navy/50">{s.label}</span>
+                      <input
+                        type="number"
+                        min="0"
+                        value={cur?.price ?? ""}
+                        placeholder={`${s.price}`}
+                        onChange={(e) => setSizePrice(s.label, e.target.value)}
+                        className="w-full rounded-xl border border-brand-navy/10 px-3 py-2 text-sm outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
+                        data-testid={`flavor-size-price-${s.label}`}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="mt-2 text-[11px] text-brand-navy/40">Kosongkan untuk mengikuti harga global ukuran.</p>
+            </div>
+          )}
           <div>
             <label className="mb-1 block text-xs font-bold text-brand-navy/60">Foto Varian</label>
             <ImageUpload value={f.image} onChange={(url) => set("image", url)} testid="flavor-form-image" />
@@ -184,6 +218,18 @@ export default function ContentEditor() {
   }, []);
 
   const setC = (k) => (e) => setContent((c) => ({ ...c, [k]: e.target.value }));
+  const setSizeAt = (i, k, v) =>
+    setContent((c) => ({ ...c, sizes: (c.sizes || []).map((s, idx) => (idx === i ? { ...s, [k]: v } : s)) }));
+  const removeSizeAt = (i) =>
+    setContent((c) => ({ ...c, sizes: (c.sizes || []).filter((_, idx) => idx !== i) }));
+  const addSize = () =>
+    setContent((c) => ({ ...c, sizes: [...(c.sizes || []), { label: "", price: 15000 }] }));
+  const setManifestoAt = (i, k, v) =>
+    setContent((c) => ({ ...c, manifesto: (c.manifesto || []).map((m, idx) => (idx === i ? { ...m, [k]: v } : m)) }));
+  const removeManifestoAt = (i) =>
+    setContent((c) => ({ ...c, manifesto: (c.manifesto || []).filter((_, idx) => idx !== i) }));
+  const addManifesto = () =>
+    setContent((c) => ({ ...c, manifesto: [...(c.manifesto || []), { title: "", body: "" }] }));
 
   const saveContent = async () => {
     setSaving(true);
@@ -197,6 +243,11 @@ export default function ContentEditor() {
         marquee_text: content.marquee_text,
         whatsapp_number: content.whatsapp_number,
         price_display: content.price_display,
+        logo_image: content.logo_image || "",
+        sizes: (content.sizes || [])
+          .map((s) => ({ label: String(s.label || "").trim(), price: parseInt(s.price, 10) || 0 }))
+          .filter((s) => s.label),
+        manifesto: (content.manifesto || []).filter((m) => (m.title || "").trim()),
         pickup_address: content.pickup_address,
         pickup_hours: content.pickup_hours,
         facts: content.facts || [],
@@ -251,6 +302,15 @@ export default function ContentEditor() {
             <textarea value={content.hero_subtitle || ""} onChange={setC("hero_subtitle")} rows={3} className={`${inputCls} resize-none`} data-testid="cms-hero-subtitle" />
           </div>
           <div>
+            <label className="mb-1 block text-xs font-bold text-brand-navy/60">Logo (navbar & footer)</label>
+            <ImageUpload
+              value={content.logo_image || ""}
+              onChange={(url) => setContent((c) => ({ ...c, logo_image: url }))}
+              testid="cms-logo-image"
+            />
+            <p className="mt-1 text-[11px] text-brand-navy/40">Kosongkan untuk memakai logo bawaan MilkyWay.</p>
+          </div>
+          <div>
             <label className="mb-1 block text-xs font-bold text-brand-navy/60">Foto Produk</label>
             <ImageUpload
               value={content.hero_image || ""}
@@ -281,6 +341,46 @@ export default function ContentEditor() {
             <div>
               <label className="mb-1 block text-xs font-bold text-brand-navy/60">Jam Pengambilan</label>
               <input value={content.pickup_hours || ""} onChange={setC("pickup_hours")} className={inputCls} data-testid="cms-pickup-hours" />
+            </div>
+          </div>
+
+          <div className="border-t border-brand-navy/5 pt-4">
+            <label className="mb-2 block text-xs font-bold text-brand-navy/60">Ukuran Botol & Harga</label>
+            <div className="space-y-2" data-testid="cms-sizes-editor">
+              {(content.sizes || []).map((s, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <input value={s.label} onChange={(e) => setSizeAt(i, "label", e.target.value)} placeholder="250ml" className={`${inputCls} w-24 shrink-0`} data-testid={`size-label-${i}`} />
+                  <input type="number" min="0" value={s.price} onChange={(e) => setSizeAt(i, "price", e.target.value)} placeholder="15000" className={inputCls} data-testid={`size-price-${i}`} />
+                  <button onClick={() => removeSizeAt(i)} className="shrink-0 rounded-xl p-2 text-brand-navy/30 transition hover:bg-red-50 hover:text-red-500" data-testid={`size-delete-${i}`} aria-label="Hapus ukuran">
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+              <button onClick={addSize} className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-brand-navy/20 px-4 py-2 text-xs font-bold text-brand-navy/50 transition hover:border-brand-blue hover:text-brand-blue" data-testid="size-add-btn">
+                <Plus className="h-3.5 w-3.5" />
+                Tambah Ukuran
+              </button>
+            </div>
+          </div>
+
+          <div className="border-t border-brand-navy/5 pt-4">
+            <label className="mb-2 block text-xs font-bold text-brand-navy/60">Janji Kami (Manifesto)</label>
+            <div className="space-y-3" data-testid="cms-manifesto-editor">
+              {(content.manifesto || []).map((m, i) => (
+                <div key={i} className="space-y-2 rounded-2xl border border-brand-navy/10 p-3" data-testid={`manifesto-row-${i}`}>
+                  <div className="flex gap-2">
+                    <input value={m.title} onChange={(e) => setManifestoAt(i, "title", e.target.value)} placeholder="Judul poin" className={inputCls} data-testid={`manifesto-title-${i}`} />
+                    <button onClick={() => removeManifestoAt(i)} className="shrink-0 rounded-xl p-2 text-brand-navy/30 transition hover:bg-red-50 hover:text-red-500" data-testid={`manifesto-delete-${i}`} aria-label="Hapus poin">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <textarea value={m.body} onChange={(e) => setManifestoAt(i, "body", e.target.value)} placeholder="Isi teks" rows={2} className={`${inputCls} resize-none`} data-testid={`manifesto-body-${i}`} />
+                </div>
+              ))}
+              <button onClick={addManifesto} className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-brand-navy/20 px-4 py-2 text-xs font-bold text-brand-navy/50 transition hover:border-brand-blue hover:text-brand-blue" data-testid="manifesto-add-btn">
+                <Plus className="h-3.5 w-3.5" />
+                Tambah Poin
+              </button>
             </div>
           </div>
 
@@ -370,7 +470,7 @@ export default function ContentEditor() {
 
       <AnimatePresence>
         {editing && (
-          <FlavorModal initial={editing} onClose={() => setEditing(null)} onSaved={loadFlavors} />
+          <FlavorModal initial={editing} onClose={() => setEditing(null)} onSaved={loadFlavors} sizes={content.sizes || []} />
         )}
       </AnimatePresence>
     </div>

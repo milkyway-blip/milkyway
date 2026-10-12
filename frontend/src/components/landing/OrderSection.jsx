@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Check, CheckCircle2, Clock, MapPin, MessageCircle, Minus, Plus, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 import { useCart } from "@/context/CartContext";
-import api, { formatApiError, formatRupiah, imgSrc, waLink } from "@/lib/api";
+import api, { formatApiError, formatRupiah, imgSrc, priceFor, waLink } from "@/lib/api";
 
 const EASE = [0.22, 1, 0.36, 1];
 
@@ -11,7 +11,7 @@ const buildWaMessage = (o) =>
   [
     "Halo MilkyWay! Saya mau pesan:",
     "",
-    ...o.items.map((i) => `- ${i.name} x${i.qty} = ${formatRupiah(i.price * i.qty)}`),
+    ...o.items.map((i) => `- ${i.name}${i.size ? ` ${i.size}` : ""} x${i.qty} = ${formatRupiah(i.price * i.qty)}`),
     "",
     `Total: ${formatRupiah(o.total)}`,
     "",
@@ -23,13 +23,97 @@ const buildWaMessage = (o) =>
     .filter((l) => l !== null)
     .join("\n");
 
+function FlavorRow({ f, sizes }) {
+  const { items, add, setQty } = useCart();
+  const [size, setSize] = useState(
+    sizes.find((s) => s.label === "350ml")?.label || sizes[0]?.label || "",
+  );
+  const unitPrice = priceFor(f, sizes, size);
+  const id = size ? `${f.id}|${size}` : f.id;
+  const q = items.find((i) => i.id === id)?.qty || 0;
+  const flavorQty = items
+    .filter((i) => (i.flavor_id || i.id) === f.id)
+    .reduce((sum, i) => sum + i.qty, 0);
+  const maxed = f.stock != null && flavorQty >= f.stock;
+
+  return (
+    <li className="flex items-center gap-3 py-3 sm:gap-4" data-testid={`cart-row-${f.key}`}>
+      <div
+        className="h-14 w-11 shrink-0 overflow-hidden rounded-xl border border-[var(--line)] sm:h-16 sm:w-12"
+        style={{ backgroundColor: f.bg_color }}
+      >
+        {f.image && <img src={imgSrc(f.image)} alt={f.name} loading="lazy" className="h-full w-full object-cover" />}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold">{f.name}</p>
+        <p className="text-xs text-[var(--ink-muted)]">
+          {formatRupiah(unitPrice)} / botol
+          {f.stock != null && (
+            <span
+              className={`ml-1.5 font-semibold ${f.stock === 0 ? "text-red-500" : "text-[var(--pasture)]"}`}
+              data-testid={`stock-${f.key}`}
+            >
+              · {f.stock === 0 ? "Stok habis" : `Stok ${f.stock}`}
+            </span>
+          )}
+        </p>
+        {sizes.length > 0 && (
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            {sizes.map((s) => (
+              <button
+                key={s.label}
+                type="button"
+                onClick={() => setSize(s.label)}
+                className={`rounded-full border px-2.5 py-1 font-mono text-[10px] tracking-wide transition ${
+                  size === s.label
+                    ? "border-transparent bg-[var(--pasture)] text-[var(--cream)]"
+                    : "border-[var(--line)] bg-white text-[var(--ink-muted)] hover:border-[var(--pasture)]/40"
+                }`}
+                data-testid={`size-pill-${f.key}-${s.label}`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          disabled={q === 0}
+          onClick={() => setQty(id, q - 1)}
+          className="grid h-9 w-9 place-items-center rounded-full border border-[var(--line)] transition-colors hover:bg-[var(--milk-2)] disabled:opacity-30"
+          data-testid={`cart-minus-${f.key}`}
+          aria-label={`Kurangi ${f.name}`}
+        >
+          <Minus className="h-3.5 w-3.5" />
+        </button>
+        <span className="w-7 text-center font-display text-xl font-semibold tabular-nums" data-testid={`cart-qty-${f.key}`}>
+          {q}
+        </span>
+        <button
+          type="button"
+          disabled={maxed}
+          onClick={() => (q === 0 ? add(f, 1, size, unitPrice) : setQty(id, q + 1))}
+          className="grid h-9 w-9 place-items-center rounded-full text-[var(--cream)] transition-transform hover:scale-105 disabled:opacity-30 disabled:hover:scale-100"
+          style={{ background: f.text_color }}
+          data-testid={`cart-plus-${f.key}`}
+          aria-label={`Tambah ${f.name}`}
+        >
+          <Plus className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    </li>
+  );
+}
+
 export default function OrderSection({ flavors, content }) {
-  const { items, add, setQty, clear, count, total } = useCart();
+  const { items, setQty, clear, count, total } = useCart();
   const [form, setForm] = useState({ name: "", whatsapp: "", note: "" });
   const [sending, setSending] = useState(false);
   const [placed, setPlaced] = useState(null);
+  const sizes = content.sizes || [];
 
-  const qtyOf = (id) => items.find((i) => i.id === id)?.qty || 0;
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const submit = async (e) => {
@@ -45,7 +129,11 @@ export default function OrderSection({ flavors, content }) {
         customer_name: form.name,
         whatsapp: form.whatsapp,
         note: form.note,
-        items: items.map((i) => ({ flavor_id: i.id, qty: i.qty })),
+        items: items.map((i) => ({
+          flavor_id: i.flavor_id || i.id,
+          qty: i.qty,
+          size: i.size || "",
+        })),
       });
       setPlaced(data);
       clear();
@@ -74,16 +162,12 @@ export default function OrderSection({ flavors, content }) {
               Dingin segar, <em className="font-light italic text-[var(--pasture)]">siap</em> kamu nikmati.
             </h2>
             <p className="mt-6 max-w-md text-base leading-relaxed text-[var(--ink-muted)] md:text-lg">
-              Campur varian sesukamu dalam satu pesanan. Kami simpan pesananmu, lalu konfirmasi lewat WhatsApp.
+              Campur varian dan ukuran sesukamu dalam satu pesanan. Kami simpan pesananmu, lalu konfirmasi lewat WhatsApp.
             </p>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 32 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.7, delay: 0.1, ease: EASE }}
-            className="glass mt-10 rounded-[1.75rem] p-6"
+          <div
+            className="mt-10 rounded-[1.75rem] border border-[var(--line)] bg-white p-6"
             data-testid="order-summary"
           >
             <div className="mb-4 flex items-center gap-3">
@@ -102,7 +186,9 @@ export default function OrderSection({ flavors, content }) {
                 {items.map((i) => (
                   <li key={i.id} className="flex justify-between text-[var(--ink)]/80">
                     <span>
-                      {i.name} <span className="font-semibold">x{i.qty}</span>
+                      {i.name}
+                      {i.size ? <span className="text-[var(--ink-muted)]"> ({i.size})</span> : null}{" "}
+                      <span className="font-semibold">x{i.qty}</span>
                     </span>
                     <span className="font-semibold">{formatRupiah(i.price * i.qty)}</span>
                   </li>
@@ -116,15 +202,11 @@ export default function OrderSection({ flavors, content }) {
                 {formatRupiah(total)}
               </p>
             </div>
-          </motion.div>
+          </div>
 
           {(content.pickup_address || content.pickup_hours) && (
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, ease: EASE }}
-              className="glass mt-4 rounded-[1.75rem] p-6"
+            <div
+              className="mt-4 rounded-[1.75rem] border border-[var(--line)] bg-white p-6"
               data-testid="pickup-info"
             >
               <p className="eyebrow mb-4">Pengambilan Pesanan</p>
@@ -142,17 +224,11 @@ export default function OrderSection({ flavors, content }) {
                   </p>
                 )}
               </div>
-            </motion.div>
+            </div>
           )}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, ease: EASE }}
-          className="lg:col-span-7"
-        >
+        <div className="lg:col-span-7">
           <div className="rounded-[2rem] border border-[var(--line)] bg-white p-6 shadow-[0_40px_80px_-50px_rgba(26,26,24,0.35)] sm:p-10">
             {placed ? (
               <div className="flex flex-col items-center py-10 text-center" data-testid="order-success-message">
@@ -191,59 +267,9 @@ export default function OrderSection({ flavors, content }) {
                     </span>
                   </div>
                   <ul className="divide-y divide-[var(--line)]" data-testid="cart-list">
-                    {flavors.map((f) => {
-                      const q = qtyOf(f.id);
-                      return (
-                        <li key={f.id} className="flex items-center gap-3 py-3 sm:gap-4" data-testid={`cart-row-${f.key}`}>
-                          <div
-                            className="h-14 w-11 shrink-0 overflow-hidden rounded-xl border border-[var(--line)] sm:h-16 sm:w-12"
-                            style={{ backgroundColor: f.bg_color }}
-                          >
-                            {f.image && <img src={imgSrc(f.image)} alt={f.name} loading="lazy" className="h-full w-full object-cover" />}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-semibold">{f.name}</p>
-                            <p className="text-xs text-[var(--ink-muted)]">
-                              {formatRupiah(f.price)} / botol
-                              {f.stock != null && (
-                                <span
-                                  className={`ml-1.5 font-semibold ${f.stock === 0 ? "text-red-500" : "text-[var(--pasture)]"}`}
-                                  data-testid={`stock-${f.key}`}
-                                >
-                                  · {f.stock === 0 ? "Stok habis" : `Stok ${f.stock}`}
-                                </span>
-                              )}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              disabled={q === 0}
-                              onClick={() => setQty(f.id, q - 1)}
-                              className="grid h-9 w-9 place-items-center rounded-full border border-[var(--line)] transition-colors hover:bg-[var(--milk-2)] disabled:opacity-30"
-                              data-testid={`cart-minus-${f.key}`}
-                              aria-label={`Kurangi ${f.name}`}
-                            >
-                              <Minus className="h-3.5 w-3.5" />
-                            </button>
-                            <span className="w-7 text-center font-display text-xl font-semibold tabular-nums" data-testid={`cart-qty-${f.key}`}>
-                              {q}
-                            </span>
-                            <button
-                              type="button"
-                              disabled={f.stock != null && q >= f.stock}
-                              onClick={() => (q === 0 ? add(f, 1) : setQty(f.id, q + 1))}
-                              className="grid h-9 w-9 place-items-center rounded-full text-[var(--cream)] transition-transform hover:scale-105 disabled:opacity-30 disabled:hover:scale-100"
-                              style={{ background: f.text_color }}
-                              data-testid={`cart-plus-${f.key}`}
-                              aria-label={`Tambah ${f.name}`}
-                            >
-                              <Plus className="h-3.5 w-3.5" />
-                            </button>
-                          </div>
-                        </li>
-                      );
-                    })}
+                    {flavors.map((f) => (
+                      <FlavorRow key={f.id} f={f} sizes={sizes} />
+                    ))}
                   </ul>
                 </div>
 
@@ -271,7 +297,7 @@ export default function OrderSection({ flavors, content }) {
               </form>
             )}
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

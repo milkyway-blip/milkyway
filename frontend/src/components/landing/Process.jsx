@@ -23,9 +23,9 @@ const STEPS = [
   },
   {
     n: "04",
-    value: "350 ml",
+    value: "4 Ukuran",
     title: "Botol & Segel",
-    body: "Dituang ke botol bersih, disegel rapat, dan diberi tanggal batch produksi.",
+    body: "Tersedia 250ml sampai 1 liter, disegel rapat dan diberi tanggal batch produksi.",
   },
 ];
 

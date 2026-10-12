@@ -113,7 +113,9 @@ export default function OrdersTable() {
                 {o.items.map((i) => (
                   <li key={i.flavor_id} className="flex justify-between text-brand-navy/70">
                     <span>
-                      {i.name} <span className="font-bold text-brand-navy">x{i.qty}</span>
+                      {i.name}
+                      {i.size ? <span className="text-brand-navy/50"> {i.size}</span> : null}{" "}
+                      <span className="font-bold text-brand-navy">x{i.qty}</span>
                     </span>
                     <span className="font-semibold">{formatRupiah(i.price * i.qty)}</span>
                   </li>

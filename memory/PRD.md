@@ -66,6 +66,18 @@ Landing page produk susu MilkyWay (susu sapi pasteurisasi 350ml) dengan 10 varia
 - Teks footer diganti: "Susu Sapi Pasteurisasi — tanpa pengawet, tanpa pemanis buatan."; dikonfirmasi gambar hero & per-varian sudah editable via CMS
 - Hero bottle card kini memakai foto produk asli (MilkyWay Matcha, diunggah user via storage) diset lewat field hero_image CMS
 
+## Iterasi 9 (12 Okt 2026)
+- Ukuran botol multi-size: content.sizes (250ml/12rb, 350ml/15rb, 500ml/20rb, 1L/30rb — editable CMS), pill ukuran per baris di Pilih Varian & di showcase, harga ikut ukuran, keranjang komposit flavor|size, WA/CSV/admin menampilkan ukuran, stok agregat per rasa
+- Manifesto jadi CMS (content.manifesto, editor judul+isi di tab Konten), teks baru tanpa klaim kedekatan peternakan; marquee dibersihkan dari frasa peternakan
+- Seksi Langganan (mingguan/bulanan, min 2 botol 1L, radius 2km, free ongkir) dengan CTA WhatsApp
+- Alamat pengambilan asli: Bazaf Jogja, Jl. Tegalrejo, Kota Yogyakarta 55244
+- Logo landing (navbar/footer/favicon) bisa diganti via CMS field logo_image (fallback /logo.png); link Masuk Admin di footer dihapus
+- Anti-lag seksi Pesan: kartu ringkasan/pickup tanpa backdrop-blur, kartu form tanpa animasi entrance
+
+## Iterasi 10 (12 Okt 2026)
+- Harga ukuran asli: 250ml=14rb, 350ml=15rb, 500ml=18rb, 1L=30rb (via CMS sizes)
+- Harga khusus per varian per ukuran: field size_prices di Flavor, editor 4 input di modal varian (kosong = ikut harga global), resolusi harga: override varian > harga global ukuran > harga varian; helper priceFor di lib/api.js
+
 ## Backlog
 - P0: (kosong — semua permintaan awal terpenuhi)
 - P1: upload gambar langsung (object storage) alih-alih URL; notifikasi email pesanan baru; edit konten Info Produk via CMS

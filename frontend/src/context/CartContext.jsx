@@ -17,20 +17,24 @@ export function CartProvider({ children }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
-  const add = (flavor, qty = 1) => {
+  const add = (flavor, qty = 1, size = "", price = null) => {
+    const id = size ? `${flavor.id}|${size}` : flavor.id;
+    const unitPrice = price ?? flavor.price;
     setItems((prev) => {
-      const found = prev.find((i) => i.id === flavor.id);
+      const found = prev.find((i) => i.id === id);
       if (found) {
         return prev.map((i) =>
-          i.id === flavor.id ? { ...i, qty: Math.min(i.qty + qty, 99) } : i,
+          i.id === id ? { ...i, qty: Math.min(i.qty + qty, 99) } : i,
         );
       }
       return [
         ...prev,
         {
-          id: flavor.id,
+          id,
+          flavor_id: flavor.id,
           name: flavor.name,
-          price: flavor.price,
+          size,
+          price: unitPrice,
           image: flavor.image,
           bg_color: flavor.bg_color,
           text_color: flavor.text_color,

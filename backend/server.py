@@ -89,6 +89,11 @@ def to_object_id(oid: str) -> ObjectId:
 
 
 # ---------- Models ----------
+class Size(BaseModel):
+    label: str
+    price: int = 15000
+
+
 class Flavor(BaseDocument):
     key: str
     name: str
@@ -101,6 +106,7 @@ class Flavor(BaseDocument):
     active: bool = True
     order: int = 0
     stock: Optional[int] = None
+    size_prices: List[Size] = Field(default_factory=list)
 
 
 class FlavorInput(BaseModel):
@@ -113,12 +119,18 @@ class FlavorInput(BaseModel):
     price: int = 15000
     active: bool = True
     stock: Optional[int] = None
+    size_prices: List[Size] = Field(default_factory=list)
 
 
 class Fact(BaseModel):
     icon: str = "shield"
     title: str = ""
     text: str = ""
+
+
+class ManifestoItem(BaseModel):
+    title: str = ""
+    body: str = ""
 
 
 class ContentModel(BaseDocument):
@@ -132,7 +144,10 @@ class ContentModel(BaseDocument):
     whatsapp_number: str = "081227646940"
     price_display: str = "Rp 15.000"
     unit_size: str = "350ml"
+    logo_image: str = ""
     facts: List[Fact] = Field(default_factory=list)
+    sizes: List[Size] = Field(default_factory=list)
+    manifesto: List[ManifestoItem] = Field(default_factory=list)
     pickup_address: str = ""
     pickup_hours: str = ""
 
@@ -146,7 +161,10 @@ class ContentUpdate(BaseModel):
     marquee_text: Optional[str] = None
     whatsapp_number: Optional[str] = None
     price_display: Optional[str] = None
+    logo_image: Optional[str] = None
     facts: Optional[List[Fact]] = None
+    sizes: Optional[List[Size]] = None
+    manifesto: Optional[List[ManifestoItem]] = None
     pickup_address: Optional[str] = None
     pickup_hours: Optional[str] = None
 
@@ -154,6 +172,7 @@ class ContentUpdate(BaseModel):
 class OrderItem(BaseModel):
     flavor_id: str
     name: str
+    size: str = ""
     qty: int
     price: int
 
@@ -172,6 +191,7 @@ class Order(BaseDocument):
 class OrderItemInput(BaseModel):
     flavor_id: str
     qty: int
+    size: str = ""
 
 
 class OrderInput(BaseModel):
@@ -354,17 +374,26 @@ async def track_visit():
 async def create_order(body: OrderInput):
     if not body.items:
         raise HTTPException(status_code=400, detail="Keranjang masih kosong")
+    content_doc = await db.site_content.find_one({"key": "landing"}) or {}
+    size_price = {s["label"]: int(s["price"]) for s in content_doc.get("sizes", [])}
+    per_flavor = {}
+    for it in body.items:
+        per_flavor[it.flavor_id] = per_flavor.get(it.flavor_id, 0) + it.qty
     items, total = [], 0
     for it in body.items:
         fl = await db.flavors.find_one({"_id": to_object_id(it.flavor_id)})
         if not fl or not fl.get("active", True):
             raise HTTPException(status_code=400, detail="Ada varian yang tidak tersedia")
         stock = fl.get("stock")
-        if stock is not None and it.qty > stock:
+        if stock is not None and per_flavor[it.flavor_id] > stock:
             raise HTTPException(status_code=400, detail=f"Stok {fl['name']} tersisa {stock}")
         qty = max(1, min(it.qty, 99))
-        price = int(fl.get("price", 15000))
-        items.append(OrderItem(flavor_id=str(fl["_id"]), name=fl["name"], qty=qty, price=price))
+        fl_size_price = {s["label"]: int(s["price"]) for s in fl.get("size_prices", [])}
+        if it.size:
+            price = fl_size_price.get(it.size) or size_price.get(it.size) or int(fl.get("price", 15000))
+        else:
+            price = int(fl.get("price", 15000))
+        items.append(OrderItem(flavor_id=str(fl["_id"]), name=fl["name"], size=it.size, qty=qty, price=price))
         total += price * qty
     order = Order(customer_name=body.customer_name.strip(), whatsapp=body.whatsapp.strip(),
                   address=body.address.strip(), note=body.note.strip(), items=items, total=total)
@@ -392,7 +421,10 @@ async def export_orders_csv(user=Depends(get_current_user)):
     writer = csv.writer(buf)
     writer.writerow(["Tanggal", "Nama", "WhatsApp", "Alamat", "Catatan", "Item", "Total Botol", "Total Harga", "Status"])
     for d in docs:
-        items = "; ".join(f"{i.get('name', '')} x{i.get('qty', 0)}" for i in d.get("items", []))
+        items = "; ".join(
+            f"{(i.get('name', '') + (' ' + i.get('size')) if i.get('size') else i.get('name', ''))} x{i.get('qty', 0)}"
+            for i in d.get("items", [])
+        )
         qty = sum(i.get("qty", 0) for i in d.get("items", []))
         created = d.get("created_at")
         tanggal = created.strftime("%Y-%m-%d %H:%M") if isinstance(created, datetime) else str(created or "")
@@ -629,6 +661,18 @@ DEFAULT_CONTENT = {
         {"icon": "timer", "title": "Suhu Ruang", "text": "Tahan hingga 6 jam di suhu ruang \u2014 segera dinginkan kembali."},
         {"icon": "shield", "title": "Tersertifikasi Halal", "text": "No. Sertifikat ID34110080995230926."},
     ],
+    "sizes": [
+        {"label": "250ml", "price": 12000},
+        {"label": "350ml", "price": 15000},
+        {"label": "500ml", "price": 20000},
+        {"label": "1L", "price": 30000},
+    ],
+    "manifesto": [
+        {"title": "Bahan baku segar, diseleksi ketat.", "body": "Kami hanya memakai susu sapi segar yang lolos seleksi kualitas. Begitu tiba, susu langsung didinginkan dalam hitungan menit."},
+        {"title": "Pasteurisasi presisi, bukan perebusan berlebihan.", "body": "Susu dipanaskan sebentar pada suhu dan waktu yang tepat, lalu didinginkan cepat. Hasilnya: rasa creamy alami yang tetap terjaga di setiap botol."},
+        {"title": "Rantai dingin yang tidak pernah putus.", "body": "Dari tangki pendingin hingga botol yang disegel, semuanya terjaga di 2\u20134\u00b0C. Karena susu segar hanya layak disebut segar jika suhunya konsisten."},
+        {"title": "Botol kecil, standar besar.", "body": "Setiap botol disegel rapat dan diberi tanggal batch, jadi kamu tahu persis kapan susumu diproduksi. Tanpa pengawet, tanpa pemanis buatan."},
+    ],
 }
 
 DEFAULT_TESTIMONIALS = [
@@ -665,6 +709,12 @@ async def seed_content():
             "pickup_hours": DEFAULT_CONTENT["pickup_hours"],
         }})
         logger.info("Pickup info migrated")
+    if existing and "sizes" not in existing:
+        await db.site_content.update_one({"key": "landing"}, {"$set": {
+            "sizes": DEFAULT_CONTENT["sizes"],
+            "manifesto": DEFAULT_CONTENT["manifesto"],
+        }})
+        logger.info("Sizes & manifesto migrated")
     if await db.testimonials.count_documents({}) == 0:
         for i, t in enumerate(DEFAULT_TESTIMONIALS):
             await db.testimonials.insert_one(Testimonial(order=i, **t).to_mongo())
