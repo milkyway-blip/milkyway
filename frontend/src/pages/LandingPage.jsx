@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Lenis from "lenis";
-import api from "@/lib/api";
+import api, { imgSrc } from "@/lib/api";
 import Header from "@/components/landing/Navbar";
 import Hero from "@/components/landing/Hero";
 import Marquee from "@/components/landing/Marquee";
@@ -10,6 +10,7 @@ import Process from "@/components/landing/Process";
 import ProductInfo from "@/components/landing/ProductInfo";
 import Testimonials from "@/components/landing/Testimonials";
 import FAQ from "@/components/landing/FAQ";
+import Subscription from "@/components/landing/Subscription";
 import OrderSection from "@/components/landing/OrderSection";
 import Footer from "@/components/landing/Footer";
 import WhatsAppFloat from "@/components/landing/WhatsAppFloat";
@@ -44,6 +45,13 @@ export default function LandingPage() {
     }
   }, []);
 
+  useEffect(() => {
+    if (data?.content?.logo_image) {
+      const link = document.querySelector("link[rel~='icon']");
+      if (link) link.href = imgSrc(data.content.logo_image);
+    }
+  }, [data]);
+
   if (!data) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[var(--cream)]" data-testid="landing-loading">
@@ -68,15 +76,17 @@ export default function LandingPage() {
         <FlavorShowcase
           flavors={flavors}
           unitSize={content.unit_size}
+          sizes={content.sizes || []}
           selectedKey={selectedFlavor}
           onSelect={setSelectedFlavor}
         />
-        <Manifesto />
+        <Manifesto items={content.manifesto || []} />
         <Process />
         <Marquee text={content.marquee_text} theme="green" />
         <ProductInfo facts={content.facts || []} />
         <Testimonials items={data.testimonials || []} />
         <FAQ />
+        <Subscription content={content} />
         <OrderSection flavors={flavors} content={content} />
       </main>
       <Footer content={content} />

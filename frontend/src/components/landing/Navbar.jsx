@@ -1,5 +1,6 @@
 import { ShoppingBag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { imgSrc } from "@/lib/api";
 
 const LINKS = [
   { id: "varian", label: "Varian Rasa", testid: "nav-link-varian" },
@@ -24,7 +25,7 @@ export default function Header({ content }) {
           data-testid="nav-logo"
           aria-label="MilkyWay beranda"
         >
-          <img src="/logo.png" alt={content.product_name || "MilkyWay"} className="h-7 w-auto sm:h-8" />
+          <img src={content.logo_image ? imgSrc(content.logo_image) : "/logo.png"} alt={content.product_name || "MilkyWay"} className="h-7 w-auto sm:h-8" />
         </button>
 
         <nav className="hidden items-center gap-6 text-[13px] font-medium text-[var(--ink)]/70 lg:flex">

@@ -7,12 +7,14 @@ import { formatRupiah, imgSrc } from "@/lib/api";
 
 const EASE = [0.22, 1, 0.36, 1];
 
-export default function FlavorShowcase({ flavors, unitSize, selectedKey, onSelect }) {
+export default function FlavorShowcase({ flavors, unitSize, sizes = [], selectedKey, onSelect }) {
   const { add } = useCart();
   const [qty, setQty] = useState(1);
+  const [size, setSize] = useState(sizes.find((s) => s.label === "350ml")?.label || sizes[0]?.label || "");
 
   if (!flavors.length) return null;
   const active = flavors.find((f) => f.key === selectedKey) || flavors[0];
+  const unitPrice = sizes.find((s) => s.label === size)?.price ?? active.price;
 
   const pick = (key) => {
     onSelect(key);
@@ -20,8 +22,8 @@ export default function FlavorShowcase({ flavors, unitSize, selectedKey, onSelec
   };
 
   const handleAdd = () => {
-    add(active, qty);
-    toast.success(`${active.name} x${qty} masuk keranjang`, {
+    add(active, qty, size, unitPrice);
+    toast.success(`${active.name}${size ? ` ${size}` : ""} x${qty} masuk keranjang`, {
       action: {
         label: "Lihat",
         onClick: () => document.getElementById("pesan")?.scrollIntoView({ behavior: "smooth" }),
@@ -89,9 +91,7 @@ export default function FlavorShowcase({ flavors, unitSize, selectedKey, onSelec
             className="mt-10 grid items-center gap-10 lg:grid-cols-2 lg:gap-16"
             data-testid="flavor-detail"
           >
-            <div
-              className="relative aspect-[5/4] overflow-hidden rounded-[2rem] border border-black/10 bg-white shadow-[0_40px_80px_-50px_rgba(26,26,24,0.35)]"
-            >
+            <div className="relative aspect-[5/4] overflow-hidden rounded-[2rem] border border-black/10 bg-white shadow-[0_40px_80px_-50px_rgba(26,26,24,0.35)]">
               {active.image && (
                 <img
                   src={imgSrc(active.image)}
@@ -101,7 +101,7 @@ export default function FlavorShowcase({ flavors, unitSize, selectedKey, onSelec
                 />
               )}
               <span className="absolute bottom-4 left-4 rounded-full bg-[var(--pasture)] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--cream)]">
-                {unitSize}
+                {size || unitSize}
               </span>
             </div>
 
@@ -123,18 +123,40 @@ export default function FlavorShowcase({ flavors, unitSize, selectedKey, onSelec
                 </span>
               </div>
 
+              {sizes.length > 0 && (
+                <div className="mt-6" data-testid="flavor-sizes">
+                  <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--ink-muted)]">Ukuran botol</p>
+                  <div className="flex flex-wrap gap-2">
+                    {sizes.map((s) => (
+                      <button
+                        key={s.label}
+                        onClick={() => setSize(s.label)}
+                        className={`rounded-full border px-4 py-2 font-mono text-xs tracking-wide transition ${
+                          size === s.label
+                            ? "border-transparent bg-[var(--pasture)] text-[var(--cream)]"
+                            : "border-[var(--line)] bg-white/70 text-[var(--ink)] hover:border-[var(--pasture)]/40"
+                        }`}
+                        data-testid={`showcase-size-${s.label}`}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="mt-8 flex flex-wrap items-center gap-5">
                 <div>
                   <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--ink-muted)]">Harga per botol</p>
                   <p className="mt-1 font-display text-3xl font-semibold" data-testid="flavor-detail-price">
-                    {formatRupiah(active.price)}
+                    {formatRupiah(unitPrice)}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setQty((q) => Math.max(1, q - 1))}
                     disabled={qty <= 1}
-                    className="grid h-9 w-9 place-items-center rounded-full border border-[var(--line)] transition-colors hover:bg-[var(--milk-2)] disabled:opacity-30"
+                    className="grid h-9 w-9 place-items-center rounded-full border border-[var(--line)] transition-colors hover:bg-white/70 disabled:opacity-30"
                     data-testid={`qty-minus-${active.key}`}
                     aria-label="Kurangi"
                   >

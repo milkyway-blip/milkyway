@@ -1,6 +1,5 @@
 import { Clock, MessageCircle, ShieldCheck } from "lucide-react";
-import { Link } from "react-router-dom";
-import { waLink } from "@/lib/api";
+import { imgSrc, waLink } from "@/lib/api";
 
 export default function Footer({ content }) {
   const scrollTo = (id) =>
@@ -11,7 +10,7 @@ export default function Footer({ content }) {
       <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 sm:py-20 md:grid-cols-[1.3fr_1fr_1fr] lg:px-12">
         <div>
           <div className="inline-flex rounded-full bg-[var(--cream)] px-5 py-2.5">
-            <img src="/logo.png" alt={content.product_name} className="h-8 w-auto" />
+            <img src={content.logo_image ? imgSrc(content.logo_image) : "/logo.png"} alt={content.product_name} className="h-8 w-auto" />
           </div>
           <p className="mt-5 max-w-sm font-display text-2xl font-light leading-snug text-[var(--cream)]/90">
             {content.tagline} — tanpa pengawet, tanpa pemanis buatan.
@@ -45,11 +44,6 @@ export default function Footer({ content }) {
               <button onClick={() => scrollTo("pesan")} className="transition hover:text-[var(--gold)]" data-testid="footer-link-pesan">
                 Pesan
               </button>
-            </li>
-            <li>
-              <Link to="/admin/login" className="transition hover:text-[var(--gold)]" data-testid="footer-admin-link">
-                Masuk Admin
-              </Link>
             </li>
           </ul>
         </div>
